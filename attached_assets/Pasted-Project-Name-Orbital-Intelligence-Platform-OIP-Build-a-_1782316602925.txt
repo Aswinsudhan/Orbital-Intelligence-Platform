@@ -1,0 +1,244 @@
+Project Name: Orbital Intelligence Platform (OIP)
+
+Build a production-ready full-stack web application called "Orbital Intelligence Platform" focused on real satellite tracking, orbital analytics, collision risk analysis, orbital congestion forecasting, and satellite risk scoring.
+
+IMPORTANT:
+Do NOT use mock satellite data for the core application.
+Use real publicly available satellite orbital data from CelesTrak as the  source. And also from from live datasets.
+
+Technology Stack:
+
+* Frontend: React
+* Backend: Python Flask
+* Database: PostgreSQL (fallback SQLite)
+* Data Processing: Python
+* Charts: Plotly or Chart.js
+* Modern responsive UI
+* Dark space-themed design
+
+1. Connect to CelesTrak.
+
+2. Automatically download:
+
+* Active satellites
+* Space debris
+* Rocket bodies
+* Starlink satellites
+* Weather satellites
+* Navigation satellites
+
+3. Store all downloaded data in database tables.
+
+4. Create an automated scheduler.
+
+Every 30 minutes:
+
+* Fetch latest CelesTrak data
+* Validate data
+* Update database
+* Recalculate analytics
+* Update dashboard
+
+5. Store:
+
+* Satellite Name
+* NORAD ID
+* Orbit Type
+* Inclination
+* Altitude
+* Epoch
+* Velocity (calculated if possible)
+* Last Update Time
+
+Landing Page:
+
+* Professional aerospace UI
+* Title: Orbital Intelligence Platform
+* Subtitle: Real-Time Satellite Tracking and Orbital Intelligence
+
+Navigation:
+
+* Dashboard
+* Satellites
+* Debris
+* Analytics
+* Risk Engine
+* About
+
+Dashboard:
+Display:
+
+* Total Active Satellites
+* Total Debris Objects
+* Total Rocket Bodies
+* Latest Data Refresh Time
+* High Risk Objects
+
+Satellite Page:
+Features:
+
+* Search satellites
+* Filter by orbit
+* Sort by altitude
+* Sort by name
+* Satellite details page
+
+Display:
+
+* Name
+* NORAD ID
+* Orbit Type
+* Altitude
+* Inclination
+* Velocity
+* Last Updated
+
+Build a collision analysis engine.
+
+Features:
+
+* Identify nearby satellites
+* Identify nearby debris
+* Calculate separation distances
+* Detect close approaches
+* Generate collision warnings
+
+Risk Levels:
+
+* Low
+* Medium
+* High
+* Critical
+
+Collision Dashboard:
+
+* High Risk Objects
+* Upcoming Close Approaches
+* Risk Trends
+
+Build an AI-based forecasting system.
+
+Requirements:
+
+* Collect historical satellite snapshots
+* Store historical records
+* Track congestion growth
+
+Generate:
+
+* Orbit density heatmaps
+* Congestion trends
+* Future congestion predictions
+
+Forecast:
+
+* 30 days
+* 90 days
+* 1 year
+
+Machine Learning:
+
+* Scikit-learn
+* Time-series forecasting
+
+Create a risk score between 0 and 100.
+
+Factors:
+
+* Nearby debris count
+* Orbit congestion
+* Collision probability
+* Satellite age
+* Close approach frequency
+
+Categories:
+0-25 Low
+26-50 Medium
+51-75 High
+76-100 Critical
+
+Display:
+
+* Risk score
+* Risk category
+* Explanation of score
+
+Create a Space Visualization page.
+
+Display:
+
+* Earth at center
+* Satellites orbiting Earth
+* Debris objects
+* Orbit paths
+* Satellite labels
+
+Allow:
+
+* Zoom
+* Rotate
+* Search satellite
+* Click satellite for details
+
+Use CesiumJS if possible.
+
+Create:
+
+GET /api/satellites
+GET /api/debris
+GET /api/analytics
+GET /api/risk
+GET /api/congestion
+GET /api/collisions
+GET /api/last-update
+
+satellites
+debris
+rocket_bodies
+collision_events
+congestion_history
+risk_scores
+
+Admin Dashboard:
+
+* Manual data refresh
+* Scheduler status
+* Data source status
+* API health monitoring
+
+Requirements:
+
+* Clean architecture
+* Modular code
+* Error handling
+* Logging
+* Documentation
+* Environment variables
+* Production-ready folder structure
+
+Folder Structure:
+
+frontend/
+backend/
+database/
+data/
+models/
+analytics/
+scheduler/
+services/
+docs/
+tests/
+
+The application must use real CelesTrak satellite data rather than static demo data.
+
+Design the architecture so future integration with:
+
+* N2YO API
+* Additional satellite catalogs
+* Space weather data
+* Advanced machine learning models
+* ISRO or other research datasets
+
+can be added easily without restructuring the application.
+
+Generate all code, database schemas, APIs, UI pages, scheduler jobs, services, and setup instructions necessary to run the complete platform.

@@ -3,20 +3,29 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Orbital Intelligence Platform API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: satellites
+    description: Satellite data
+  - name: debris
+    description: Debris and rocket body data
+  - name: analytics
+    description: Orbital analytics and congestion
+  - name: risk
+    description: Risk scoring and collision analysis
+  - name: admin
+    description: Admin operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +33,275 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /satellites:
+    get:
+      operationId: listSatellites
+      tags: [satellites]
+      summary: List all tracked satellites
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: orbitType
+          in: query
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: [name, altitude, inclination, noradId]
+        - name: sortOrder
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of satellites
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SatelliteListResponse"
+
+  /satellites/{id}:
+    get:
+      operationId: getSatellite
+      tags: [satellites]
+      summary: Get satellite by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Satellite details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SatelliteDetail"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /debris:
+    get:
+      operationId: listDebris
+      tags: [debris]
+      summary: List debris and rocket bodies
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [debris, rocket_body, all]
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of debris objects
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebrisListResponse"
+
+  /analytics/overview:
+    get:
+      operationId: getAnalyticsOverview
+      tags: [analytics]
+      summary: Get high-level orbital analytics overview
+      responses:
+        "200":
+          description: Analytics overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsOverview"
+
+  /analytics/congestion:
+    get:
+      operationId: getCongestionData
+      tags: [analytics]
+      summary: Get orbit congestion data and density heatmap
+      responses:
+        "200":
+          description: Congestion data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CongestionData"
+
+  /analytics/forecast:
+    get:
+      operationId: getOrbitalForecast
+      tags: [analytics]
+      summary: Get orbital congestion forecasts
+      parameters:
+        - name: horizon
+          in: query
+          schema:
+            type: string
+            enum: ["30d", "90d", "1y"]
+      responses:
+        "200":
+          description: Forecast data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForecastData"
+
+  /analytics/orbit-distribution:
+    get:
+      operationId: getOrbitDistribution
+      tags: [analytics]
+      summary: Get distribution of objects by orbit type
+      responses:
+        "200":
+          description: Orbit distribution
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OrbitBand"
+
+  /risk/scores:
+    get:
+      operationId: listRiskScores
+      tags: [risk]
+      summary: Get risk scores for all tracked objects
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [low, medium, high, critical]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Risk scores list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RiskScore"
+
+  /risk/scores/{noradId}:
+    get:
+      operationId: getRiskScore
+      tags: [risk]
+      summary: Get risk score for a specific satellite by NORAD ID
+      parameters:
+        - name: noradId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Risk score detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RiskScoreDetail"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /collisions:
+    get:
+      operationId: listCollisions
+      tags: [risk]
+      summary: Get collision events and close approaches
+      parameters:
+        - name: riskLevel
+          in: query
+          schema:
+            type: string
+            enum: [low, medium, high, critical]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Collision events
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollisionListResponse"
+
+  /last-update:
+    get:
+      operationId: getLastUpdate
+      tags: [admin]
+      summary: Get the last data refresh timestamp and counts
+      responses:
+        "200":
+          description: Last update info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LastUpdateInfo"
+
+  /admin/refresh:
+    post:
+      operationId: triggerRefresh
+      tags: [admin]
+      summary: Manually trigger a data refresh from CelesTrak
+      responses:
+        "200":
+          description: Refresh triggered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RefreshResult"
+
+  /admin/status:
+    get:
+      operationId: getAdminStatus
+      tags: [admin]
+      summary: Get scheduler and system status
+      responses:
+        "200":
+          description: System status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SystemStatus"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +312,360 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+
+    Satellite:
+      type: object
+      required: [id, noradId, name, orbitType, altitude, inclination, epoch, lastUpdated]
+      properties:
+        id:
+          type: integer
+        noradId:
+          type: integer
+        name:
+          type: string
+        orbitType:
+          type: string
+        altitude:
+          type: ["number", "null"]
+        inclination:
+          type: ["number", "null"]
+        velocity:
+          type: ["number", "null"]
+        epoch:
+          type: string
+        eccentricity:
+          type: ["number", "null"]
+        raan:
+          type: ["number", "null"]
+        lastUpdated:
+          type: string
+
+    SatelliteDetail:
+      type: object
+      required: [id, noradId, name, orbitType, altitude, inclination, epoch, lastUpdated, riskScore]
+      properties:
+        id:
+          type: integer
+        noradId:
+          type: integer
+        name:
+          type: string
+        orbitType:
+          type: string
+        altitude:
+          type: ["number", "null"]
+        inclination:
+          type: ["number", "null"]
+        velocity:
+          type: ["number", "null"]
+        epoch:
+          type: string
+        eccentricity:
+          type: ["number", "null"]
+        raan:
+          type: ["number", "null"]
+        lastUpdated:
+          type: string
+        riskScore:
+          type: ["number", "null"]
+        riskCategory:
+          type: ["string", "null"]
+
+    SatelliteListResponse:
+      type: object
+      required: [data, total, page, limit]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Satellite"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    DebrisObject:
+      type: object
+      required: [id, noradId, name, objectType, altitude, inclination, epoch, lastUpdated]
+      properties:
+        id:
+          type: integer
+        noradId:
+          type: integer
+        name:
+          type: string
+        objectType:
+          type: string
+        altitude:
+          type: ["number", "null"]
+        inclination:
+          type: ["number", "null"]
+        epoch:
+          type: string
+        eccentricity:
+          type: ["number", "null"]
+        lastUpdated:
+          type: string
+
+    DebrisListResponse:
+      type: object
+      required: [data, total, page, limit]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/DebrisObject"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    AnalyticsOverview:
+      type: object
+      required: [totalSatellites, totalDebris, totalRocketBodies, highRiskObjects, lastRefresh, orbitBreakdown]
+      properties:
+        totalSatellites:
+          type: integer
+        totalDebris:
+          type: integer
+        totalRocketBodies:
+          type: integer
+        highRiskObjects:
+          type: integer
+        criticalRiskObjects:
+          type: integer
+        lastRefresh:
+          type: ["string", "null"]
+        orbitBreakdown:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrbitBand"
+        recentCollisionWarnings:
+          type: integer
+
+    OrbitBand:
+      type: object
+      required: [orbitType, count, percentage]
+      properties:
+        orbitType:
+          type: string
+        count:
+          type: integer
+        percentage:
+          type: number
+
+    CongestionData:
+      type: object
+      required: [altitudeBands, densityByInclination, history]
+      properties:
+        altitudeBands:
+          type: array
+          items:
+            $ref: "#/components/schemas/AltitudeBand"
+        densityByInclination:
+          type: array
+          items:
+            $ref: "#/components/schemas/InclinationBand"
+        history:
+          type: array
+          items:
+            $ref: "#/components/schemas/CongestionHistoryPoint"
+
+    AltitudeBand:
+      type: object
+      required: [altitudeKm, count, label]
+      properties:
+        altitudeKm:
+          type: integer
+        count:
+          type: integer
+        label:
+          type: string
+
+    InclinationBand:
+      type: object
+      required: [inclinationDeg, count]
+      properties:
+        inclinationDeg:
+          type: integer
+        count:
+          type: integer
+
+    CongestionHistoryPoint:
+      type: object
+      required: [date, totalObjects, satellites, debris]
+      properties:
+        date:
+          type: string
+        totalObjects:
+          type: integer
+        satellites:
+          type: integer
+        debris:
+          type: integer
+
+    ForecastData:
+      type: object
+      required: [horizon, dataPoints, trend, confidence]
+      properties:
+        horizon:
+          type: string
+        dataPoints:
+          type: array
+          items:
+            $ref: "#/components/schemas/ForecastPoint"
+        trend:
+          type: string
+        confidence:
+          type: number
+
+    ForecastPoint:
+      type: object
+      required: [date, predicted, lower, upper]
+      properties:
+        date:
+          type: string
+        predicted:
+          type: number
+        lower:
+          type: number
+        upper:
+          type: number
+
+    RiskScore:
+      type: object
+      required: [noradId, name, score, category, lastCalculated]
+      properties:
+        noradId:
+          type: integer
+        name:
+          type: string
+        score:
+          type: number
+        category:
+          type: string
+        lastCalculated:
+          type: string
+
+    RiskScoreDetail:
+      type: object
+      required: [noradId, name, score, category, factors, lastCalculated]
+      properties:
+        noradId:
+          type: integer
+        name:
+          type: string
+        score:
+          type: number
+        category:
+          type: string
+        lastCalculated:
+          type: string
+        factors:
+          $ref: "#/components/schemas/RiskFactors"
+
+    RiskFactors:
+      type: object
+      required: [nearbyDebrisCount, orbitCongestion, collisionProbability, satelliteAge, closeApproachFrequency]
+      properties:
+        nearbyDebrisCount:
+          type: number
+        orbitCongestion:
+          type: number
+        collisionProbability:
+          type: number
+        satelliteAge:
+          type: number
+        closeApproachFrequency:
+          type: number
+
+    CollisionEvent:
+      type: object
+      required: [id, object1Name, object2Name, object1NoradId, object2NoradId, missDistanceKm, riskLevel, predictedTime]
+      properties:
+        id:
+          type: integer
+        object1Name:
+          type: string
+        object2Name:
+          type: string
+        object1NoradId:
+          type: integer
+        object2NoradId:
+          type: integer
+        missDistanceKm:
+          type: number
+        riskLevel:
+          type: string
+        predictedTime:
+          type: ["string", "null"]
+        probability:
+          type: ["number", "null"]
+
+    CollisionListResponse:
+      type: object
+      required: [data, total, highRiskCount, criticalCount]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/CollisionEvent"
+        total:
+          type: integer
+        highRiskCount:
+          type: integer
+        criticalCount:
+          type: integer
+
+    LastUpdateInfo:
+      type: object
+      required: [lastRefresh, satelliteCount, debrisCount, rocketBodyCount]
+      properties:
+        lastRefresh:
+          type: ["string", "null"]
+        satelliteCount:
+          type: integer
+        debrisCount:
+          type: integer
+        rocketBodyCount:
+          type: integer
+        nextRefresh:
+          type: ["string", "null"]
+
+    RefreshResult:
+      type: object
+      required: [success, message, startedAt]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        startedAt:
+          type: string
+
+    SystemStatus:
+      type: object
+      required: [schedulerRunning, lastRefresh, nextRefresh, dataSourceStatus, apiHealth]
+      properties:
+        schedulerRunning:
+          type: boolean
+        lastRefresh:
+          type: ["string", "null"]
+        nextRefresh:
+          type: ["string", "null"]
+        dataSourceStatus:
+          type: object
+          additionalProperties:
+            type: string
+        apiHealth:
+          type: string
