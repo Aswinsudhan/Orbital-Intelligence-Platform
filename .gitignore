@@ -47,3 +47,21 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+.agents/
+
+# Logs
+*.log
+logs/
+/tmp/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# pnpm
+.pnpm-store/
+
+# Test coverage
+coverage/
+.nyc_output/
