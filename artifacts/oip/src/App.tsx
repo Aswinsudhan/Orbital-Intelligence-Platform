@@ -18,6 +18,7 @@ import RiskEngine from "@/pages/risk";
 import Collisions from "@/pages/collisions";
 import Admin from "@/pages/admin";
 import About from "@/pages/about";
+import Launches from "@/pages/launches";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,9 @@ function Router() {
         </Route>
         <Route path="/collisions">
           <Layout><Collisions /></Layout>
+        </Route>
+        <Route path="/launches">
+          <Layout><Launches /></Layout>
         </Route>
         <Route path="/admin">
           <Layout><Admin /></Layout>

@@ -21,7 +21,8 @@ import {
   AlertTriangle,
   ShieldAlert,
   Settings,
-  Info
+  Info,
+  Flame
 } from "lucide-react";
 
 export function AppSidebar() {
@@ -35,6 +36,7 @@ export function AppSidebar() {
     { title: "Forecast", url: "/analytics/forecast", icon: TrendingUp },
     { title: "Risk Engine", url: "/risk", icon: ShieldAlert },
     { title: "Collisions", url: "/collisions", icon: AlertTriangle },
+    { title: "Launches", url: "/launches", icon: Flame },
     { title: "Admin", url: "/admin", icon: Settings },
     { title: "About", url: "/about", icon: Info },
   ];
