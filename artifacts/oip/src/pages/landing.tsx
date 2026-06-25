@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Rocket, Satellite, Activity } from "lucide-react";
+import { playClick } from "@/lib/sounds";
 
 export default function Landing() {
   return (
@@ -23,12 +24,12 @@ export default function Landing() {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
           <Button asChild size="lg" className="w-full sm:w-auto text-lg px-8 h-14">
-            <Link href="/dashboard">
+            <Link href="/dashboard" onClick={() => playClick()}>
               Launch Dashboard
             </Link>
           </Button>
           <Button asChild variant="outline" size="lg" className="w-full sm:w-auto text-lg px-8 h-14">
-            <Link href="/satellites">
+            <Link href="/satellites" onClick={() => playClick()}>
               View Catalog
             </Link>
           </Button>

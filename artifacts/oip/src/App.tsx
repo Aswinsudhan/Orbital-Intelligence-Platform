@@ -1,10 +1,11 @@
 import { useEffect } from "react";
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Layout } from "@/components/layout/Layout";
 import NotFound from "@/pages/not-found";
+import { playNav } from "@/lib/sounds";
 
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
@@ -20,28 +21,55 @@ import About from "@/pages/about";
 
 const queryClient = new QueryClient();
 
+function NavSound() {
+  const [location] = useLocation();
+  useEffect(() => {
+    if (location !== "/") playNav();
+  }, [location]);
+  return null;
+}
+
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={Landing} />
-      <Route path="/:rest*">
-        <Layout>
-          <Switch>
-            <Route path="/dashboard" component={Dashboard} />
-            <Route path="/satellites" component={Satellites} />
-            <Route path="/satellites/:id" component={SatelliteDetail} />
-            <Route path="/debris" component={Debris} />
-            <Route path="/analytics" component={Analytics} />
-            <Route path="/analytics/forecast" component={Forecast} />
-            <Route path="/risk" component={RiskEngine} />
-            <Route path="/collisions" component={Collisions} />
-            <Route path="/admin" component={Admin} />
-            <Route path="/about" component={About} />
-            <Route component={NotFound} />
-          </Switch>
-        </Layout>
-      </Route>
-    </Switch>
+    <>
+      <NavSound />
+      <Switch>
+        <Route path="/" component={Landing} />
+        <Route path="/dashboard">
+          <Layout><Dashboard /></Layout>
+        </Route>
+        <Route path="/satellites/:id">
+          <Layout><SatelliteDetail /></Layout>
+        </Route>
+        <Route path="/satellites">
+          <Layout><Satellites /></Layout>
+        </Route>
+        <Route path="/debris">
+          <Layout><Debris /></Layout>
+        </Route>
+        <Route path="/analytics/forecast">
+          <Layout><Forecast /></Layout>
+        </Route>
+        <Route path="/analytics">
+          <Layout><Analytics /></Layout>
+        </Route>
+        <Route path="/risk">
+          <Layout><RiskEngine /></Layout>
+        </Route>
+        <Route path="/collisions">
+          <Layout><Collisions /></Layout>
+        </Route>
+        <Route path="/admin">
+          <Layout><Admin /></Layout>
+        </Route>
+        <Route path="/about">
+          <Layout><About /></Layout>
+        </Route>
+        <Route>
+          <Layout><NotFound /></Layout>
+        </Route>
+      </Switch>
+    </>
   );
 }
 

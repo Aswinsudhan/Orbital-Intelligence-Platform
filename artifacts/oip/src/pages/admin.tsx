@@ -45,7 +45,7 @@ export default function Admin() {
         </div>
         
         <Button 
-          onClick={() => refreshMutation.mutate({})} 
+          onClick={() => refreshMutation.mutate(undefined as any)} 
           disabled={refreshMutation.isPending}
           className="gap-2"
         >
