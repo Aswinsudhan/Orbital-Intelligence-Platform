@@ -1,11 +1,10 @@
 import { useEffect } from "react";
-import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
+import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Layout } from "@/components/layout/Layout";
 import NotFound from "@/pages/not-found";
-import { playNav } from "@/lib/sounds";
 
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
@@ -22,18 +21,9 @@ import Launches from "@/pages/launches";
 
 const queryClient = new QueryClient();
 
-function NavSound() {
-  const [location] = useLocation();
-  useEffect(() => {
-    if (location !== "/") playNav();
-  }, [location]);
-  return null;
-}
-
 function Router() {
   return (
     <>
-      <NavSound />
       <Switch>
         <Route path="/" component={Landing} />
         <Route path="/dashboard">

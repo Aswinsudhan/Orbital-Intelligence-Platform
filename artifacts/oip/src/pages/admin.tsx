@@ -41,16 +41,17 @@ export default function Admin() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">System Administration</h1>
-          <p className="text-muted-foreground mt-1">Platform health, data sources, and scheduler</p>
+          <p className="text-muted-foreground mt-1">Platform health and data sources — sync is manual</p>
         </div>
         
         <Button 
           onClick={() => refreshMutation.mutate(undefined as any)} 
           disabled={refreshMutation.isPending}
-          className="gap-2"
+          size="lg"
+          className="gap-2 shadow-lg shadow-primary/20"
         >
           <RefreshCw className={`w-4 h-4 ${refreshMutation.isPending ? 'animate-spin' : ''}`} />
-          Force CelesTrak Sync
+          {refreshMutation.isPending ? "Syncing…" : "Sync Data Now"}
         </Button>
       </div>
 
@@ -81,14 +82,12 @@ export default function Admin() {
                 </Badge>
               </div>
               <div className="flex items-center justify-between py-3 border-b border-border/50">
-                <span className="text-muted-foreground">Background Scheduler</span>
-                <Badge variant={status.schedulerRunning ? 'default' : 'secondary'} className="uppercase">
-                  {status.schedulerRunning ? 'Running' : 'Stopped'}
-                </Badge>
+                <span className="text-muted-foreground">Sync Mode</span>
+                <Badge variant="secondary" className="uppercase">Manual Only</Badge>
               </div>
               <div className="flex items-center justify-between py-3">
-                <span className="text-muted-foreground">Next Scheduled Sync</span>
-                <span className="font-mono text-sm">{status.nextRefresh ? new Date(status.nextRefresh).toLocaleString() : 'Not Scheduled'}</span>
+                <span className="text-muted-foreground">Auto-Scheduler</span>
+                <Badge variant="outline" className="uppercase text-muted-foreground">Disabled</Badge>
               </div>
             </CardContent>
           </Card>

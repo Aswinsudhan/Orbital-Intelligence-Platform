@@ -1,5 +1,4 @@
 import { Link, useLocation } from "wouter";
-import { playClick } from "@/lib/sounds";
 import {
   Sidebar,
   SidebarContent,
@@ -57,7 +56,7 @@ export function AppSidebar() {
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={location === item.url || (item.url !== "/" && location.startsWith(item.url))}>
-                    <Link href={item.url} className="flex items-center gap-3" onClick={() => playClick()}>
+                    <Link href={item.url} className="flex items-center gap-3">
                       <item.icon className="w-4 h-4" />
                       <span>{item.title}</span>
                     </Link>

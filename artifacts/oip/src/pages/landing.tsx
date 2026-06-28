@@ -1,7 +1,6 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Rocket, Satellite, Activity } from "lucide-react";
-import { playClick } from "@/lib/sounds";
 import { StarField } from "@/components/StarField";
 
 export default function Landing() {
@@ -87,13 +86,13 @@ export default function Landing() {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
           <Button asChild size="lg" className="w-full sm:w-auto text-lg px-8 h-14 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-shadow">
-            <Link href="/dashboard" onClick={() => playClick()}>
+            <Link href="/dashboard">
               <Rocket className="w-5 h-5 mr-2" />
               Launch Dashboard
             </Link>
           </Button>
           <Button asChild variant="outline" size="lg" className="w-full sm:w-auto text-lg px-8 h-14 border-white/20 hover:border-white/40 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all">
-            <Link href="/satellites" onClick={() => playClick()}>
+            <Link href="/satellites">
               View Catalog
             </Link>
           </Button>

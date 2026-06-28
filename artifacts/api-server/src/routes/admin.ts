@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db, satellitesTable, debrisTable, dataRefreshesTable, congestionHistoryTable } from "@workspace/db";
 import { eq, sql, desc } from "drizzle-orm";
-import { performDataRefresh, getRefreshState, setNextRefresh } from "../lib/data-service";
+import { performDataRefresh, getRefreshState } from "../lib/data-service";
 
 const router = Router();
 
@@ -59,18 +59,19 @@ router.get("/admin/status", async (req, res) => {
       .limit(1);
 
     res.json({
-      schedulerRunning: !state.isRefreshing,
+      schedulerRunning: false,
+      isRefreshing: state.isRefreshing,
       lastRefresh: state.lastRefreshAt?.toISOString() ?? lastRefresh?.completedAt?.toISOString() ?? null,
-      nextRefresh: state.nextRefreshAt?.toISOString() ?? null,
+      nextRefresh: null,
       dataSourceStatus: {
-        celestrak_active: "online",
-        celestrak_starlink: "online",
-        celestrak_debris: "online",
-        celestrak_rocket_bodies: "online",
-        celestrak_gps: "online",
-        celestrak_geo: "online",
+        celestrak_active: "connected",
+        celestrak_starlink: "connected",
+        celestrak_debris: "connected",
+        celestrak_rocket_bodies: "connected",
+        celestrak_gps: "connected",
+        celestrak_geo: "connected",
       },
-      apiHealth: "healthy",
+      apiHealth: "ok",
     });
   } catch (err) {
     req.log.error({ err }, "Failed to get admin status");
