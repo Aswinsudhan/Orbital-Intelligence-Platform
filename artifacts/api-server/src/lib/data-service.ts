@@ -6,9 +6,45 @@ import { logger } from "./logger";
 let isRefreshing = false;
 let lastRefreshAt: Date | null = null;
 let nextRefreshAt: Date | null = null;
+let schedulerTimer: ReturnType<typeof setInterval> | null = null;
+let schedulerIntervalMinutes = 30;
 
 export function getRefreshState() {
-  return { isRefreshing, lastRefreshAt, nextRefreshAt };
+  return {
+    isRefreshing,
+    lastRefreshAt,
+    nextRefreshAt,
+    schedulerRunning: schedulerTimer !== null,
+    schedulerIntervalMinutes,
+  };
+}
+
+export function startScheduler(intervalMinutes: number) {
+  if (schedulerTimer) {
+    clearInterval(schedulerTimer);
+  }
+  schedulerIntervalMinutes = intervalMinutes;
+  const ms = intervalMinutes * 60 * 1000;
+
+  const tick = async () => {
+    logger.info({ intervalMinutes }, "Auto-sync triggered by scheduler");
+    nextRefreshAt = new Date(Date.now() + ms);
+    await performDataRefresh("scheduler");
+    nextRefreshAt = new Date(Date.now() + ms);
+  };
+
+  nextRefreshAt = new Date(Date.now() + ms);
+  schedulerTimer = setInterval(tick, ms);
+  logger.info({ intervalMinutes }, "Auto-sync scheduler started");
+}
+
+export function stopScheduler() {
+  if (schedulerTimer) {
+    clearInterval(schedulerTimer);
+    schedulerTimer = null;
+  }
+  nextRefreshAt = null;
+  logger.info("Auto-sync scheduler stopped");
 }
 
 export function setNextRefresh(date: Date) {

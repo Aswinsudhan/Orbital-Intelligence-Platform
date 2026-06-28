@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db, satellitesTable, debrisTable, dataRefreshesTable, congestionHistoryTable } from "@workspace/db";
 import { eq, sql, desc } from "drizzle-orm";
-import { performDataRefresh, getRefreshState } from "../lib/data-service";
+import { performDataRefresh, getRefreshState, startScheduler, stopScheduler } from "../lib/data-service";
 
 const router = Router();
 
@@ -59,10 +59,11 @@ router.get("/admin/status", async (req, res) => {
       .limit(1);
 
     res.json({
-      schedulerRunning: false,
+      schedulerRunning: state.schedulerRunning,
       isRefreshing: state.isRefreshing,
+      schedulerIntervalMinutes: state.schedulerIntervalMinutes,
       lastRefresh: state.lastRefreshAt?.toISOString() ?? lastRefresh?.completedAt?.toISOString() ?? null,
-      nextRefresh: null,
+      nextRefresh: state.nextRefreshAt?.toISOString() ?? null,
       dataSourceStatus: {
         celestrak_active: "connected",
         celestrak_starlink: "connected",
@@ -77,6 +78,27 @@ router.get("/admin/status", async (req, res) => {
     req.log.error({ err }, "Failed to get admin status");
     res.status(500).json({ error: "Internal server error" });
   }
+});
+
+router.post("/admin/scheduler/enable", (req, res) => {
+  const raw = req.body?.intervalMinutes;
+  const intervalMinutes = Number(raw);
+  if (!intervalMinutes || intervalMinutes < 5 || intervalMinutes > 1440) {
+    res.status(400).json({ error: "intervalMinutes must be between 5 and 1440" });
+    return;
+  }
+  startScheduler(intervalMinutes);
+  const state = getRefreshState();
+  res.json({
+    success: true,
+    message: `Auto-sync enabled every ${intervalMinutes} minute(s)`,
+    nextRefresh: state.nextRefreshAt?.toISOString() ?? null,
+  });
+});
+
+router.post("/admin/scheduler/disable", (_req, res) => {
+  stopScheduler();
+  res.json({ success: true, message: "Auto-sync scheduler disabled" });
 });
 
 export default router;
