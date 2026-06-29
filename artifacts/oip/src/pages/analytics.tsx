@@ -4,15 +4,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, Legend } from "recharts";
 
 const ORBIT_COLORS: Record<string, string> = {
-  LEO:     "#0ea5e9",   // sky blue
-  MEO:     "#a855f7",   // purple
-  GEO:     "#f59e0b",   // amber
-  HEO:     "#10b981",   // emerald
-  DEBRIS:  "#ef4444",   // red
-  "ROCKET BODY": "#f97316", // orange
-  UNKNOWN: "#6b7280",   // gray
+  "LEO":            "#00d4ff",   // cyan
+  "MEO":            "#a855f7",   // violet
+  "GEO":            "#f59e0b",   // amber
+  "HEO":            "#22c55e",   // green
+  "Debris/R-Bodies":"#ef4444",   // red
+  "Unknown":        "#94a3b8",   // slate
 };
-const FALLBACK_COLORS = ["#0ea5e9","#a855f7","#f59e0b","#10b981","#ef4444","#f97316","#6b7280","#ec4899","#14b8a6"];
+const FALLBACK_COLORS = ["#00d4ff","#a855f7","#f59e0b","#22c55e","#ef4444","#94a3b8","#ec4899","#f97316","#14b8a6"];
 
 export default function Analytics() {
   const { data: congestion, isLoading: isLoadingCongestion } = useGetCongestionData({ query: { queryKey: getGetCongestionDataQueryKey() } });
