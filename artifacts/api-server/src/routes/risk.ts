@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { db, riskScoresTable, collisionEventsTable } from "@workspace/db";
-import { eq, desc, sql, and } from "drizzle-orm";
+import { db, riskScoresTable, collisionEventsTable, satellitesTable } from "@workspace/db";
+import { eq, desc, sql, and, inArray } from "drizzle-orm";
 import { ListRiskScoresQueryParams, GetRiskScoreParams, ListCollisionsQueryParams } from "@workspace/api-zod";
 
 const router = Router();
@@ -23,6 +23,13 @@ router.get("/scores", async (req, res) => {
       .orderBy(desc(riskScoresTable.score))
       .limit(Math.min(500, Number(limit)));
 
+    // Determine which NORAD IDs belong to the satellites table
+    const noradIds = data.map((r) => r.noradId);
+    const satRows = noradIds.length > 0
+      ? await db.select({ noradId: satellitesTable.noradId }).from(satellitesTable).where(inArray(satellitesTable.noradId, noradIds))
+      : [];
+    const satSet = new Set(satRows.map((s) => s.noradId));
+
     res.json(
       data.map((r) => ({
         noradId: r.noradId,
@@ -30,6 +37,7 @@ router.get("/scores", async (req, res) => {
         score: r.score,
         category: r.category,
         lastCalculated: r.lastCalculated,
+        objectType: satSet.has(r.noradId) ? "satellite" : "debris",
       }))
     );
   } catch (err) {

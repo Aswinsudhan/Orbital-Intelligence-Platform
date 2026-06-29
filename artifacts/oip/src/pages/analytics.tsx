@@ -3,7 +3,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, Legend } from "recharts";
 
-const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
+const ORBIT_COLORS: Record<string, string> = {
+  LEO:     "#0ea5e9",   // sky blue
+  MEO:     "#a855f7",   // purple
+  GEO:     "#f59e0b",   // amber
+  HEO:     "#10b981",   // emerald
+  DEBRIS:  "#ef4444",   // red
+  "ROCKET BODY": "#f97316", // orange
+  UNKNOWN: "#6b7280",   // gray
+};
+const FALLBACK_COLORS = ["#0ea5e9","#a855f7","#f59e0b","#10b981","#ef4444","#f97316","#6b7280","#ec4899","#14b8a6"];
 
 export default function Analytics() {
   const { data: congestion, isLoading: isLoadingCongestion } = useGetCongestionData({ query: { queryKey: getGetCongestionDataQueryKey() } });
@@ -79,7 +88,10 @@ export default function Analytics() {
                   nameKey="orbitType"
                 >
                   {distribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={ORBIT_COLORS[entry.orbitType] ?? FALLBACK_COLORS[index % FALLBACK_COLORS.length]}
+                    />
                   ))}
                 </Pie>
                 <Tooltip 

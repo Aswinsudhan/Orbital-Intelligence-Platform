@@ -110,8 +110,16 @@ export default function RiskEngine() {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="font-mono text-primary font-medium hover:underline">
-                    <Link href={`/satellites/${score.noradId}`}>{score.noradId}</Link>
+                  <TableCell className="font-mono font-medium">
+                    {(score as any).objectType === "satellite" ? (
+                      <Link href={`/satellites/${score.noradId}`} className="text-primary hover:underline">
+                        {score.noradId}
+                      </Link>
+                    ) : (
+                      <span className="text-muted-foreground" title="Debris / Rocket Body — no detail page">
+                        {score.noradId}
+                      </span>
+                    )}
                   </TableCell>
                   <TableCell className="font-medium text-foreground">{score.name}</TableCell>
                   <TableCell>
