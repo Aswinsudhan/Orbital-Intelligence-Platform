@@ -6,8 +6,8 @@ export default function TitleSlide() {
     >
       {/* Subtle orbital arc decoration */}
       <svg
-        className="absolute top-0 right-0 opacity-8"
-        style={{ width: "55vw", height: "55vw", opacity: 0.08 }}
+        className="absolute top-0 right-0"
+        style={{ width: "55vw", height: "55vw", opacity: 0.07 }}
         viewBox="0 0 500 500"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -39,16 +39,16 @@ export default function TitleSlide() {
             background: "rgba(46, 93, 155, 0.08)",
             border: "1px solid rgba(46, 93, 155, 0.25)",
             borderRadius: "4px",
-            padding: "0.5vh 1.2vw",
-            marginBottom: "2.5vh",
+            padding: "0.4vh 1.1vw",
+            marginBottom: "2vh",
           }}
         >
           <span
             style={{
               fontFamily: "var(--font-display-family)",
-              fontSize: "1.5vw",
+              fontSize: "1.4vw",
               fontWeight: 600,
-              letterSpacing: "0.1em",
+              letterSpacing: "0.06em",
               color: "#2E5D9B",
             }}
           >
@@ -60,12 +60,12 @@ export default function TitleSlide() {
         <h1
           style={{
             fontFamily: "var(--font-display-family)",
-            fontSize: "5.4vw",
+            fontSize: "5.2vw",
             fontWeight: 700,
-            lineHeight: 1.08,
+            lineHeight: 1.07,
             letterSpacing: "-0.02em",
             color: "#1B2B44",
-            marginBottom: "2vh",
+            marginBottom: "1.8vh",
           }}
         >
           Orbital Intelligence
@@ -76,9 +76,9 @@ export default function TitleSlide() {
         <p
           style={{
             fontFamily: "var(--font-body-family)",
-            fontSize: "2.2vw",
+            fontSize: "2.1vw",
             fontWeight: 400,
-            lineHeight: 1.4,
+            lineHeight: 1.3,
             color: "#586878",
             marginBottom: "0",
           }}
@@ -92,7 +92,7 @@ export default function TitleSlide() {
       <div
         className="absolute bottom-0 left-0 right-0 flex items-center"
         style={{
-          height: "13vh",
+          height: "12vh",
           borderTop: "1px solid rgba(46, 93, 155, 0.18)",
           background: "rgba(46, 93, 155, 0.04)",
           paddingLeft: "6vw",
@@ -100,70 +100,28 @@ export default function TitleSlide() {
         }}
       >
         <div className="flex items-center" style={{ flex: 1 }}>
-          <span
-            style={{
-              fontFamily: "var(--font-display-family)",
-              fontSize: "2.8vw",
-              fontWeight: 700,
-              color: "#9B6824",
-            }}
-          >
+          <span style={{ fontFamily: "var(--font-display-family)", fontSize: "2.6vw", fontWeight: 700, color: "#9B6824" }}>
             27,000+
           </span>
-          <span
-            style={{
-              fontFamily: "var(--font-body-family)",
-              fontSize: "1.7vw",
-              color: "#586878",
-              marginLeft: "0.8vw",
-            }}
-          >
+          <span style={{ fontFamily: "var(--font-body-family)", fontSize: "1.6vw", color: "#586878", marginLeft: "0.7vw" }}>
             Objects Tracked
           </span>
         </div>
-        <div style={{ width: "1px", height: "4.5vh", background: "rgba(88, 104, 120, 0.25)" }} />
+        <div style={{ width: "1px", height: "4vh", background: "rgba(88, 104, 120, 0.25)" }} />
         <div className="flex items-center" style={{ flex: 1, paddingLeft: "2.5vw" }}>
-          <span
-            style={{
-              fontFamily: "var(--font-display-family)",
-              fontSize: "2.2vw",
-              fontWeight: 700,
-              color: "#9B6824",
-            }}
-          >
+          <span style={{ fontFamily: "var(--font-display-family)", fontSize: "2.1vw", fontWeight: 700, color: "#9B6824" }}>
             Live TLE Data
           </span>
-          <span
-            style={{
-              fontFamily: "var(--font-body-family)",
-              fontSize: "1.7vw",
-              color: "#586878",
-              marginLeft: "0.8vw",
-            }}
-          >
+          <span style={{ fontFamily: "var(--font-body-family)", fontSize: "1.6vw", color: "#586878", marginLeft: "0.7vw" }}>
             via CelesTrak API
           </span>
         </div>
-        <div style={{ width: "1px", height: "4.5vh", background: "rgba(88, 104, 120, 0.25)" }} />
+        <div style={{ width: "1px", height: "4vh", background: "rgba(88, 104, 120, 0.25)" }} />
         <div className="flex items-center" style={{ flex: 1, paddingLeft: "2.5vw" }}>
-          <span
-            style={{
-              fontFamily: "var(--font-display-family)",
-              fontSize: "2.2vw",
-              fontWeight: 700,
-              color: "#9B6824",
-            }}
-          >
+          <span style={{ fontFamily: "var(--font-display-family)", fontSize: "2.1vw", fontWeight: 700, color: "#9B6824" }}>
             SGP4
           </span>
-          <span
-            style={{
-              fontFamily: "var(--font-body-family)",
-              fontSize: "1.7vw",
-              color: "#586878",
-              marginLeft: "0.8vw",
-            }}
-          >
+          <span style={{ fontFamily: "var(--font-body-family)", fontSize: "1.6vw", color: "#586878", marginLeft: "0.7vw" }}>
             Propagation Engine
           </span>
         </div>
