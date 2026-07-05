@@ -1,0 +1,31 @@
+kind = "slides"
+previewPath = "/oip-slides/"
+title = "Orbital Intelligence Platform — Presentation"
+version = "1.0.0"
+id = "artifacts/oip-slides"
+router = "path"
+
+[[integratedSkills]]
+name = "slides"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/oip-slides/" ]
+localPort = 19126
+
+[services.development]
+run = "pnpm --filter @workspace/oip-slides run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/oip-slides", "run", "build" ]
+publicDir = "artifacts/oip-slides/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19126"
+BASE_PATH = "/oip-slides/"

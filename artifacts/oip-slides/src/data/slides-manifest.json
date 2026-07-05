@@ -1,0 +1,50 @@
+[
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "position": 1,
+    "filepath": "src/pages/slides/TitleSlide.tsx",
+    "title": "Orbital Intelligence Platform",
+    "description": "Title slide — space technology software category, hero headline, key stats",
+    "speakerNotes": ""
+  },
+  {
+    "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+    "position": 2,
+    "filepath": "src/pages/slides/ProblemStatement.tsx",
+    "title": "Problem Statement",
+    "description": "The space debris crisis — 3 core problems and 3 key statistics",
+    "speakerNotes": ""
+  },
+  {
+    "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+    "position": 3,
+    "filepath": "src/pages/slides/IdeaAndSolution.tsx",
+    "title": "Idea & Proposed Solution",
+    "description": "OIP's proposed solution, implementation steps, UVPs, and problem resolution",
+    "speakerNotes": ""
+  },
+  {
+    "id": "d4e5f6a7-b8c9-0123-defa-234567890123",
+    "position": 4,
+    "filepath": "src/pages/slides/TechnicalApproach.tsx",
+    "title": "Technical Approach",
+    "description": "SGP4 algorithm, PostgreSQL database, tech stack, and 5-step process flow diagram",
+    "speakerNotes": ""
+  },
+  {
+    "id": "e5f6a7b8-c9d0-1234-efab-345678901234",
+    "position": 5,
+    "filepath": "src/pages/slides/FeasibilityViability.tsx",
+    "title": "Feasibility & Viability",
+    "description": "Technical, financial, and operational feasibility with challenges and strategies",
+    "speakerNotes": ""
+  },
+  {
+    "id": "f6a7b8c9-d0e1-2345-fabc-456789012345",
+    "position": 6,
+    "filepath": "src/pages/slides/ImpactBenefits.tsx",
+    "title": "Impact & Benefits",
+    "description": "Target audience impact, social/economic/environmental benefits",
+    "speakerNotes": ""
+  }
+]
