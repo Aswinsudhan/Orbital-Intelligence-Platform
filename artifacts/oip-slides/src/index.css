@@ -39,15 +39,15 @@
 }
 
 :root {
-  --slide-primary: #1B6CA8;
-  --slide-accent: #E8A020;
-  --slide-bg: #0A1628;
-  --slide-surface: #0F2040;
-  --slide-text: #EDF2F7;
-  --slide-muted: #7A90A8;
+  --slide-primary: #2E5D9B;
+  --slide-accent: #9B6824;
+  --slide-bg: #EEF2F8;
+  --slide-surface: #FFFFFF;
+  --slide-text: #1B2B44;
+  --slide-muted: #586878;
   --font-display-family: "Space Grotesk", sans-serif;
   --font-body-family: "DM Sans", sans-serif;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 html,

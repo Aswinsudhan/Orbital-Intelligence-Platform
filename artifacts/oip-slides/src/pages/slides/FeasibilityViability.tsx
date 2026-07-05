@@ -2,33 +2,32 @@ export default function FeasibilityViability() {
   return (
     <div
       className="relative w-screen h-screen overflow-hidden"
-      style={{ background: "#0A1628" }}
+      style={{ background: "#EEF2F8" }}
     >
-      {/* Left amber accent bar */}
+      {/* Left accent bar */}
       <div
         className="absolute left-0 top-0 bottom-0"
-        style={{ width: "0.4vw", background: "#E8A020" }}
+        style={{ width: "0.35vw", background: "#9B6824" }}
       />
 
       {/* Slide number badge */}
       <div
         className="absolute flex items-center justify-center"
         style={{
-          top: "3.5vh",
-          right: "5vw",
-          background: "rgba(232, 160, 32, 0.12)",
-          border: "1px solid rgba(232, 160, 32, 0.35)",
+          top: "3vh",
+          right: "4vw",
+          background: "rgba(155, 104, 36, 0.08)",
+          border: "1px solid rgba(155, 104, 36, 0.25)",
           borderRadius: "4px",
-          padding: "0.5vh 1.2vw",
+          padding: "0.4vh 1vw",
         }}
       >
         <span
           style={{
             fontFamily: "var(--font-display-family)",
-            fontSize: "1.8vw",
+            fontSize: "1.5vw",
             fontWeight: 600,
-            color: "#E8A020",
-            letterSpacing: "0.1em",
+            color: "#9B6824",
           }}
         >
           04 / 05
@@ -36,18 +35,15 @@ export default function FeasibilityViability() {
       </div>
 
       {/* Header */}
-      <div
-        className="absolute"
-        style={{ top: "6vh", left: "7vw", right: "5vw" }}
-      >
+      <div className="absolute" style={{ top: "5vh", left: "6vw", right: "4vw" }}>
         <div
           style={{
             fontFamily: "var(--font-display-family)",
-            fontSize: "1.6vw",
+            fontSize: "1.3vw",
             fontWeight: 600,
-            letterSpacing: "0.18em",
-            color: "#1B6CA8",
-            marginBottom: "1vh",
+            letterSpacing: "0.12em",
+            color: "#2E5D9B",
+            marginBottom: "0.8vh",
             textTransform: "uppercase",
           }}
         >
@@ -56,11 +52,11 @@ export default function FeasibilityViability() {
         <h2
           style={{
             fontFamily: "var(--font-display-family)",
-            fontSize: "4.5vw",
+            fontSize: "3.8vw",
             fontWeight: 700,
             lineHeight: 1.1,
-            letterSpacing: "-0.02em",
-            color: "#EDF2F7",
+            letterSpacing: "-0.01em",
+            color: "#1B2B44",
           }}
         >
           Potential, Challenges &amp; Strategies
@@ -70,27 +66,28 @@ export default function FeasibilityViability() {
       {/* Three columns */}
       <div
         className="absolute flex"
-        style={{ top: "26vh", left: "7vw", right: "5vw", bottom: "6vh", gap: "2vw" }}
+        style={{ top: "23vh", left: "6vw", right: "4vw", bottom: "4vh", gap: "1.8vw" }}
       >
-        {/* Technical column */}
+        {/* Technical */}
         <div
           className="flex flex-col flex-1"
           style={{
-            background: "rgba(15, 32, 64, 0.7)",
-            border: "1px solid rgba(27, 108, 168, 0.4)",
+            background: "#FFFFFF",
+            border: "1px solid rgba(46, 93, 155, 0.2)",
             borderRadius: "8px",
-            padding: "2.5vh 2vw",
-            gap: "2vh",
+            padding: "2.2vh 1.8vw",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+            gap: "1.8vh",
           }}
         >
           <div
             style={{
               fontFamily: "var(--font-display-family)",
-              fontSize: "2.4vw",
+              fontSize: "2.2vw",
               fontWeight: 700,
-              color: "#7AB8DC",
-              paddingBottom: "1.5vh",
-              borderBottom: "1px solid rgba(27, 108, 168, 0.3)",
+              color: "#2E5D9B",
+              paddingBottom: "1.2vh",
+              borderBottom: "1px solid rgba(46, 93, 155, 0.15)",
             }}
           >
             Technical
@@ -100,25 +97,18 @@ export default function FeasibilityViability() {
             <div
               style={{
                 fontFamily: "var(--font-display-family)",
-                fontSize: "1.7vw",
+                fontSize: "1.4vw",
                 fontWeight: 600,
-                color: "#E8A020",
+                color: "#9B6824",
                 textTransform: "uppercase",
-                letterSpacing: "0.08em",
-                marginBottom: "0.6vh",
+                letterSpacing: "0.06em",
+                marginBottom: "0.5vh",
               }}
             >
               Feasibility — High
             </div>
-            <p
-              style={{
-                fontFamily: "var(--font-body-family)",
-                fontSize: "2vw",
-                color: "#CBD5E0",
-                lineHeight: 1.4,
-              }}
-            >
-              Open TLE APIs, proven SGP4 algorithm (NASA-standard), and a mature TypeScript stack make this fully buildable
+            <p style={{ fontFamily: "var(--font-body-family)", fontSize: "1.8vw", color: "#2A3A54", lineHeight: 1.3 }}>
+              Open TLE APIs, proven SGP4 algorithm, and a mature TypeScript stack make this fully buildable
             </p>
           </div>
 
@@ -126,25 +116,18 @@ export default function FeasibilityViability() {
             <div
               style={{
                 fontFamily: "var(--font-display-family)",
-                fontSize: "1.7vw",
+                fontSize: "1.4vw",
                 fontWeight: 600,
-                color: "#E8AAAA",
+                color: "#B05050",
                 textTransform: "uppercase",
-                letterSpacing: "0.08em",
-                marginBottom: "0.6vh",
+                letterSpacing: "0.06em",
+                marginBottom: "0.5vh",
               }}
             >
               Challenge
             </div>
-            <p
-              style={{
-                fontFamily: "var(--font-body-family)",
-                fontSize: "2vw",
-                color: "#CBD5E0",
-                lineHeight: 1.4,
-              }}
-            >
-              TLE data refreshes every few hours — stale data reduces propagation accuracy for recent conjunction events
+            <p style={{ fontFamily: "var(--font-body-family)", fontSize: "1.8vw", color: "#2A3A54", lineHeight: 1.3 }}>
+              TLE data refreshes every few hours — stale data reduces propagation accuracy for recent conjunctions
             </p>
           </div>
 
@@ -152,48 +135,42 @@ export default function FeasibilityViability() {
             <div
               style={{
                 fontFamily: "var(--font-display-family)",
-                fontSize: "1.7vw",
+                fontSize: "1.4vw",
                 fontWeight: 600,
-                color: "#A8E8B0",
+                color: "#3E8A50",
                 textTransform: "uppercase",
-                letterSpacing: "0.08em",
-                marginBottom: "0.6vh",
+                letterSpacing: "0.06em",
+                marginBottom: "0.5vh",
               }}
             >
               Strategy
             </div>
-            <p
-              style={{
-                fontFamily: "var(--font-body-family)",
-                fontSize: "2vw",
-                color: "#CBD5E0",
-                lineHeight: 1.4,
-              }}
-            >
-              Incremental sync with configurable auto-scheduler; server-side caching minimizes redundant API calls
+            <p style={{ fontFamily: "var(--font-body-family)", fontSize: "1.8vw", color: "#2A3A54", lineHeight: 1.3 }}>
+              Incremental sync with configurable auto-scheduler; server-side caching reduces redundant API calls
             </p>
           </div>
         </div>
 
-        {/* Financial column */}
+        {/* Financial */}
         <div
           className="flex flex-col flex-1"
           style={{
-            background: "rgba(15, 32, 64, 0.7)",
-            border: "1px solid rgba(27, 108, 168, 0.4)",
+            background: "#FFFFFF",
+            border: "1px solid rgba(46, 93, 155, 0.2)",
             borderRadius: "8px",
-            padding: "2.5vh 2vw",
-            gap: "2vh",
+            padding: "2.2vh 1.8vw",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+            gap: "1.8vh",
           }}
         >
           <div
             style={{
               fontFamily: "var(--font-display-family)",
-              fontSize: "2.4vw",
+              fontSize: "2.2vw",
               fontWeight: 700,
-              color: "#7AB8DC",
-              paddingBottom: "1.5vh",
-              borderBottom: "1px solid rgba(27, 108, 168, 0.3)",
+              color: "#2E5D9B",
+              paddingBottom: "1.2vh",
+              borderBottom: "1px solid rgba(46, 93, 155, 0.15)",
             }}
           >
             Financial
@@ -203,24 +180,17 @@ export default function FeasibilityViability() {
             <div
               style={{
                 fontFamily: "var(--font-display-family)",
-                fontSize: "1.7vw",
+                fontSize: "1.4vw",
                 fontWeight: 600,
-                color: "#E8A020",
+                color: "#9B6824",
                 textTransform: "uppercase",
-                letterSpacing: "0.08em",
-                marginBottom: "0.6vh",
+                letterSpacing: "0.06em",
+                marginBottom: "0.5vh",
               }}
             >
-              Feasibility — Medium-Low
+              Feasibility — Medium
             </div>
-            <p
-              style={{
-                fontFamily: "var(--font-body-family)",
-                fontSize: "2vw",
-                color: "#CBD5E0",
-                lineHeight: 1.4,
-              }}
-            >
+            <p style={{ fontFamily: "var(--font-body-family)", fontSize: "1.8vw", color: "#2A3A54", lineHeight: 1.3 }}>
               Zero licensing cost — open-source stack and free CelesTrak data keep development cost minimal
             </p>
           </div>
@@ -229,25 +199,18 @@ export default function FeasibilityViability() {
             <div
               style={{
                 fontFamily: "var(--font-display-family)",
-                fontSize: "1.7vw",
+                fontSize: "1.4vw",
                 fontWeight: 600,
-                color: "#E8AAAA",
+                color: "#B05050",
                 textTransform: "uppercase",
-                letterSpacing: "0.08em",
-                marginBottom: "0.6vh",
+                letterSpacing: "0.06em",
+                marginBottom: "0.5vh",
               }}
             >
               Challenge
             </div>
-            <p
-              style={{
-                fontFamily: "var(--font-body-family)",
-                fontSize: "2vw",
-                color: "#CBD5E0",
-                lineHeight: 1.4,
-              }}
-            >
-              Database and compute costs scale with object count; ingesting full debris catalog requires significant storage
+            <p style={{ fontFamily: "var(--font-body-family)", fontSize: "1.8vw", color: "#2A3A54", lineHeight: 1.3 }}>
+              Database and compute costs scale with object count; full debris catalog ingestion requires significant storage
             </p>
           </div>
 
@@ -255,48 +218,42 @@ export default function FeasibilityViability() {
             <div
               style={{
                 fontFamily: "var(--font-display-family)",
-                fontSize: "1.7vw",
+                fontSize: "1.4vw",
                 fontWeight: 600,
-                color: "#A8E8B0",
+                color: "#3E8A50",
                 textTransform: "uppercase",
-                letterSpacing: "0.08em",
-                marginBottom: "0.6vh",
+                letterSpacing: "0.06em",
+                marginBottom: "0.5vh",
               }}
             >
               Strategy
             </div>
-            <p
-              style={{
-                fontFamily: "var(--font-body-family)",
-                fontSize: "2vw",
-                color: "#CBD5E0",
-                lineHeight: 1.4,
-              }}
-            >
+            <p style={{ fontFamily: "var(--font-body-family)", fontSize: "1.8vw", color: "#2A3A54", lineHeight: 1.3 }}>
               Tiered data model: track high-priority objects in full, archive low-risk debris at lower resolution
             </p>
           </div>
         </div>
 
-        {/* Operational column */}
+        {/* Operational */}
         <div
           className="flex flex-col flex-1"
           style={{
-            background: "rgba(15, 32, 64, 0.7)",
-            border: "1px solid rgba(27, 108, 168, 0.4)",
+            background: "#FFFFFF",
+            border: "1px solid rgba(46, 93, 155, 0.2)",
             borderRadius: "8px",
-            padding: "2.5vh 2vw",
-            gap: "2vh",
+            padding: "2.2vh 1.8vw",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+            gap: "1.8vh",
           }}
         >
           <div
             style={{
               fontFamily: "var(--font-display-family)",
-              fontSize: "2.4vw",
+              fontSize: "2.2vw",
               fontWeight: 700,
-              color: "#7AB8DC",
-              paddingBottom: "1.5vh",
-              borderBottom: "1px solid rgba(27, 108, 168, 0.3)",
+              color: "#2E5D9B",
+              paddingBottom: "1.2vh",
+              borderBottom: "1px solid rgba(46, 93, 155, 0.15)",
             }}
           >
             Operational
@@ -306,25 +263,18 @@ export default function FeasibilityViability() {
             <div
               style={{
                 fontFamily: "var(--font-display-family)",
-                fontSize: "1.7vw",
+                fontSize: "1.4vw",
                 fontWeight: 600,
-                color: "#E8A020",
+                color: "#9B6824",
                 textTransform: "uppercase",
-                letterSpacing: "0.08em",
-                marginBottom: "0.6vh",
+                letterSpacing: "0.06em",
+                marginBottom: "0.5vh",
               }}
             >
               Feasibility — High
             </div>
-            <p
-              style={{
-                fontFamily: "var(--font-body-family)",
-                fontSize: "2vw",
-                color: "#CBD5E0",
-                lineHeight: 1.4,
-              }}
-            >
-              Browser-based deployment — no installation required; accessible to satellite operators, researchers, and agencies
+            <p style={{ fontFamily: "var(--font-body-family)", fontSize: "1.8vw", color: "#2A3A54", lineHeight: 1.3 }}>
+              Browser-based deployment — no installation required; accessible to operators, researchers, and agencies
             </p>
           </div>
 
@@ -332,24 +282,17 @@ export default function FeasibilityViability() {
             <div
               style={{
                 fontFamily: "var(--font-display-family)",
-                fontSize: "1.7vw",
+                fontSize: "1.4vw",
                 fontWeight: 600,
-                color: "#E8AAAA",
+                color: "#B05050",
                 textTransform: "uppercase",
-                letterSpacing: "0.08em",
-                marginBottom: "0.6vh",
+                letterSpacing: "0.06em",
+                marginBottom: "0.5vh",
               }}
             >
               Challenge
             </div>
-            <p
-              style={{
-                fontFamily: "var(--font-body-family)",
-                fontSize: "2vw",
-                color: "#CBD5E0",
-                lineHeight: 1.4,
-              }}
-            >
+            <p style={{ fontFamily: "var(--font-body-family)", fontSize: "1.8vw", color: "#2A3A54", lineHeight: 1.3 }}>
               Adoption requires trust in risk scores; users accustomed to specialized tools may need onboarding
             </p>
           </div>
@@ -358,24 +301,17 @@ export default function FeasibilityViability() {
             <div
               style={{
                 fontFamily: "var(--font-display-family)",
-                fontSize: "1.7vw",
+                fontSize: "1.4vw",
                 fontWeight: 600,
-                color: "#A8E8B0",
+                color: "#3E8A50",
                 textTransform: "uppercase",
-                letterSpacing: "0.08em",
-                marginBottom: "0.6vh",
+                letterSpacing: "0.06em",
+                marginBottom: "0.5vh",
               }}
             >
               Strategy
             </div>
-            <p
-              style={{
-                fontFamily: "var(--font-body-family)",
-                fontSize: "2vw",
-                color: "#CBD5E0",
-                lineHeight: 1.4,
-              }}
-            >
+            <p style={{ fontFamily: "var(--font-body-family)", fontSize: "1.8vw", color: "#2A3A54", lineHeight: 1.3 }}>
               Transparent scoring breakdown per object; risk factors visible alongside each score for auditability
             </p>
           </div>

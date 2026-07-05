@@ -2,33 +2,32 @@ export default function TechnicalApproach() {
   return (
     <div
       className="relative w-screen h-screen overflow-hidden"
-      style={{ background: "#0A1628" }}
+      style={{ background: "#EEF2F8" }}
     >
-      {/* Left amber accent bar */}
+      {/* Left accent bar */}
       <div
         className="absolute left-0 top-0 bottom-0"
-        style={{ width: "0.4vw", background: "#E8A020" }}
+        style={{ width: "0.35vw", background: "#9B6824" }}
       />
 
       {/* Slide number badge */}
       <div
         className="absolute flex items-center justify-center"
         style={{
-          top: "3.5vh",
-          right: "5vw",
-          background: "rgba(232, 160, 32, 0.12)",
-          border: "1px solid rgba(232, 160, 32, 0.35)",
+          top: "3vh",
+          right: "4vw",
+          background: "rgba(155, 104, 36, 0.08)",
+          border: "1px solid rgba(155, 104, 36, 0.25)",
           borderRadius: "4px",
-          padding: "0.5vh 1.2vw",
+          padding: "0.4vh 1vw",
         }}
       >
         <span
           style={{
             fontFamily: "var(--font-display-family)",
-            fontSize: "1.8vw",
+            fontSize: "1.5vw",
             fontWeight: 600,
-            color: "#E8A020",
-            letterSpacing: "0.1em",
+            color: "#9B6824",
           }}
         >
           03 / 05
@@ -36,18 +35,15 @@ export default function TechnicalApproach() {
       </div>
 
       {/* Header */}
-      <div
-        className="absolute"
-        style={{ top: "6vh", left: "7vw", right: "5vw" }}
-      >
+      <div className="absolute" style={{ top: "5vh", left: "6vw", right: "4vw" }}>
         <div
           style={{
             fontFamily: "var(--font-display-family)",
-            fontSize: "1.6vw",
+            fontSize: "1.3vw",
             fontWeight: 600,
-            letterSpacing: "0.18em",
-            color: "#1B6CA8",
-            marginBottom: "1vh",
+            letterSpacing: "0.12em",
+            color: "#2E5D9B",
+            marginBottom: "0.8vh",
             textTransform: "uppercase",
           }}
         >
@@ -56,41 +52,41 @@ export default function TechnicalApproach() {
         <h2
           style={{
             fontFamily: "var(--font-display-family)",
-            fontSize: "4.5vw",
+            fontSize: "3.8vw",
             fontWeight: 700,
             lineHeight: 1.1,
-            letterSpacing: "-0.02em",
-            color: "#EDF2F7",
+            letterSpacing: "-0.01em",
+            color: "#1B2B44",
           }}
         >
           Architecture &amp; Process Flow
         </h2>
       </div>
 
-      {/* Tech stack chips row */}
+      {/* Tech stack chips */}
       <div
         className="absolute flex"
-        style={{ top: "26vh", left: "7vw", right: "5vw", gap: "2vw" }}
+        style={{ top: "23vh", left: "6vw", right: "4vw", gap: "1.8vw" }}
       >
-        {/* Algorithm chip */}
         <div
           className="flex-1"
           style={{
-            background: "rgba(15, 32, 64, 0.9)",
-            border: "1px solid rgba(27, 108, 168, 0.4)",
+            background: "#FFFFFF",
+            border: "1px solid rgba(46, 93, 155, 0.2)",
             borderRadius: "8px",
-            padding: "2vh 2vw",
+            padding: "1.8vh 1.8vw",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
           }}
         >
           <div
             style={{
               fontFamily: "var(--font-display-family)",
-              fontSize: "1.6vw",
+              fontSize: "1.3vw",
               fontWeight: 600,
-              color: "#7AB8DC",
-              letterSpacing: "0.1em",
+              color: "#2E5D9B",
+              letterSpacing: "0.08em",
               textTransform: "uppercase",
-              marginBottom: "1vh",
+              marginBottom: "0.8vh",
             }}
           >
             Algorithm
@@ -98,44 +94,38 @@ export default function TechnicalApproach() {
           <div
             style={{
               fontFamily: "var(--font-display-family)",
-              fontSize: "2.5vw",
+              fontSize: "2.2vw",
               fontWeight: 700,
-              color: "#E8A020",
-              marginBottom: "0.6vh",
+              color: "#9B6824",
+              marginBottom: "0.5vh",
             }}
           >
             SGP4 / SDP4
           </div>
-          <div
-            style={{
-              fontFamily: "var(--font-body-family)",
-              fontSize: "2vw",
-              color: "#7A90A8",
-            }}
-          >
-            NASA-standard orbital propagation model for LEO/MEO/GEO/HEO
+          <div style={{ fontFamily: "var(--font-body-family)", fontSize: "1.7vw", color: "#586878", lineHeight: 1.3 }}>
+            NASA-standard orbital propagation for LEO / MEO / GEO / HEO
           </div>
         </div>
 
-        {/* Database chip */}
         <div
           className="flex-1"
           style={{
-            background: "rgba(15, 32, 64, 0.9)",
-            border: "1px solid rgba(27, 108, 168, 0.4)",
+            background: "#FFFFFF",
+            border: "1px solid rgba(46, 93, 155, 0.2)",
             borderRadius: "8px",
-            padding: "2vh 2vw",
+            padding: "1.8vh 1.8vw",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
           }}
         >
           <div
             style={{
               fontFamily: "var(--font-display-family)",
-              fontSize: "1.6vw",
+              fontSize: "1.3vw",
               fontWeight: 600,
-              color: "#7AB8DC",
-              letterSpacing: "0.1em",
+              color: "#2E5D9B",
+              letterSpacing: "0.08em",
               textTransform: "uppercase",
-              marginBottom: "1vh",
+              marginBottom: "0.8vh",
             }}
           >
             Database
@@ -143,44 +133,38 @@ export default function TechnicalApproach() {
           <div
             style={{
               fontFamily: "var(--font-display-family)",
-              fontSize: "2.5vw",
+              fontSize: "2.2vw",
               fontWeight: 700,
-              color: "#E8A020",
-              marginBottom: "0.6vh",
+              color: "#9B6824",
+              marginBottom: "0.5vh",
             }}
           >
             PostgreSQL
           </div>
-          <div
-            style={{
-              fontFamily: "var(--font-body-family)",
-              fontSize: "2vw",
-              color: "#7A90A8",
-            }}
-          >
+          <div style={{ fontFamily: "var(--font-body-family)", fontSize: "1.7vw", color: "#586878", lineHeight: 1.3 }}>
             Drizzle ORM — satellites, debris, risk scores, collision events
           </div>
         </div>
 
-        {/* Tech stack chip */}
         <div
           className="flex-1"
           style={{
-            background: "rgba(15, 32, 64, 0.9)",
-            border: "1px solid rgba(27, 108, 168, 0.4)",
+            background: "#FFFFFF",
+            border: "1px solid rgba(46, 93, 155, 0.2)",
             borderRadius: "8px",
-            padding: "2vh 2vw",
+            padding: "1.8vh 1.8vw",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
           }}
         >
           <div
             style={{
               fontFamily: "var(--font-display-family)",
-              fontSize: "1.6vw",
+              fontSize: "1.3vw",
               fontWeight: 600,
-              color: "#7AB8DC",
-              letterSpacing: "0.1em",
+              color: "#2E5D9B",
+              letterSpacing: "0.08em",
               textTransform: "uppercase",
-              marginBottom: "1vh",
+              marginBottom: "0.8vh",
             }}
           >
             Tech Stack
@@ -188,119 +172,102 @@ export default function TechnicalApproach() {
           <div
             style={{
               fontFamily: "var(--font-display-family)",
-              fontSize: "2.5vw",
+              fontSize: "2.2vw",
               fontWeight: 700,
-              color: "#E8A020",
-              marginBottom: "0.6vh",
+              color: "#9B6824",
+              marginBottom: "0.5vh",
             }}
           >
-            React 19 + Node.js 24
+            React 19 + Node 24
           </div>
-          <div
-            style={{
-              fontFamily: "var(--font-body-family)",
-              fontSize: "2vw",
-              color: "#7A90A8",
-            }}
-          >
+          <div style={{ fontFamily: "var(--font-body-family)", fontSize: "1.7vw", color: "#586878", lineHeight: 1.3 }}>
             Express 5 • TypeScript 5.9 • Tailwind CSS • Drizzle ORM
           </div>
         </div>
       </div>
 
-      {/* Process flow section label */}
+      {/* Flow diagram label */}
       <div
         className="absolute"
-        style={{ top: "52vh", left: "7vw" }}
+        style={{ top: "51vh", left: "6vw" }}
       >
         <div
           style={{
             fontFamily: "var(--font-display-family)",
-            fontSize: "1.6vw",
+            fontSize: "1.3vw",
             fontWeight: 600,
-            letterSpacing: "0.15em",
-            color: "#1B6CA8",
+            letterSpacing: "0.1em",
+            color: "#2E5D9B",
             textTransform: "uppercase",
-            marginBottom: "1.5vh",
+            marginBottom: "1vh",
           }}
         >
           Process Flow Architecture
         </div>
       </div>
 
-      {/* Process flow SVG diagram */}
+      {/* Process flow SVG */}
       <div
         className="absolute"
-        style={{ top: "57vh", left: "7vw", right: "5vw", height: "34vh" }}
+        style={{ top: "55.5vh", left: "6vw", right: "4vw", height: "36vh" }}
       >
         <svg
           width="100%"
           height="100%"
-          viewBox="0 0 1000 200"
+          viewBox="0 0 1000 190"
           xmlns="http://www.w3.org/2000/svg"
           preserveAspectRatio="xMidYMid meet"
         >
           <defs>
-            <marker
-              id="arrowhead"
-              markerWidth="10"
-              markerHeight="7"
-              refX="10"
-              refY="3.5"
-              orient="auto"
-            >
-              <polygon points="0 0, 10 3.5, 0 7" fill="#E8A020" />
+            <marker id="arr" markerWidth="9" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 9 3.5, 0 7" fill="#9B6824" />
             </marker>
           </defs>
 
-          {/* Box 1 — CelesTrak API */}
-          <rect x="10" y="40" width="155" height="80" rx="6" fill="#0F2040" stroke="#1B6CA8" strokeWidth="1.5" />
-          <text x="87" y="72" textAnchor="middle" fill="#EDF2F7" fontSize="15" fontFamily="Space Grotesk" fontWeight="700">CelesTrak</text>
-          <text x="87" y="95" textAnchor="middle" fill="#7A90A8" fontSize="12" fontFamily="DM Sans">Live TLE API</text>
-          <text x="87" y="112" textAnchor="middle" fill="#4A6080" fontSize="11" fontFamily="DM Sans">TLE/JSON feed</text>
+          {/* Box 1 */}
+          <rect x="8" y="30" width="160" height="80" rx="6" fill="#FFFFFF" stroke="#CBD8E8" strokeWidth="1.5" />
+          <text x="88" y="62" textAnchor="middle" fill="#1B2B44" fontSize="14" fontFamily="Space Grotesk" fontWeight="700">CelesTrak</text>
+          <text x="88" y="84" textAnchor="middle" fill="#586878" fontSize="12" fontFamily="DM Sans">Live TLE API</text>
+          <text x="88" y="101" textAnchor="middle" fill="#9AAABB" fontSize="11" fontFamily="DM Sans">TLE / JSON feed</text>
 
-          {/* Arrow 1 → 2 */}
-          <line x1="165" y1="80" x2="200" y2="80" stroke="#E8A020" strokeWidth="2" markerEnd="url(#arrowhead)" />
+          <line x1="168" y1="70" x2="202" y2="70" stroke="#9B6824" strokeWidth="2" markerEnd="url(#arr)" />
 
-          {/* Box 2 — TLE Parser */}
-          <rect x="200" y="40" width="155" height="80" rx="6" fill="#0F2040" stroke="#1B6CA8" strokeWidth="1.5" />
-          <text x="277" y="72" textAnchor="middle" fill="#EDF2F7" fontSize="15" fontFamily="Space Grotesk" fontWeight="700">TLE Parser</text>
-          <text x="277" y="95" textAnchor="middle" fill="#7A90A8" fontSize="12" fontFamily="DM Sans">Orbital element</text>
-          <text x="277" y="112" textAnchor="middle" fill="#4A6080" fontSize="11" fontFamily="DM Sans">extraction</text>
+          {/* Box 2 */}
+          <rect x="202" y="30" width="160" height="80" rx="6" fill="#FFFFFF" stroke="#CBD8E8" strokeWidth="1.5" />
+          <text x="282" y="62" textAnchor="middle" fill="#1B2B44" fontSize="14" fontFamily="Space Grotesk" fontWeight="700">TLE Parser</text>
+          <text x="282" y="84" textAnchor="middle" fill="#586878" fontSize="12" fontFamily="DM Sans">Orbital element</text>
+          <text x="282" y="101" textAnchor="middle" fill="#9AAABB" fontSize="11" fontFamily="DM Sans">extraction</text>
 
-          {/* Arrow 2 → 3 */}
-          <line x1="355" y1="80" x2="390" y2="80" stroke="#E8A020" strokeWidth="2" markerEnd="url(#arrowhead)" />
+          <line x1="362" y1="70" x2="396" y2="70" stroke="#9B6824" strokeWidth="2" markerEnd="url(#arr)" />
 
-          {/* Box 3 — SGP4 Engine */}
-          <rect x="390" y="40" width="155" height="80" rx="6" fill="#0F2040" stroke="#E8A020" strokeWidth="2" />
-          <text x="467" y="72" textAnchor="middle" fill="#E8A020" fontSize="15" fontFamily="Space Grotesk" fontWeight="700">SGP4 Engine</text>
-          <text x="467" y="95" textAnchor="middle" fill="#7A90A8" fontSize="12" fontFamily="DM Sans">Position &amp; velocity</text>
-          <text x="467" y="112" textAnchor="middle" fill="#4A6080" fontSize="11" fontFamily="DM Sans">propagation</text>
+          {/* Box 3 — highlighted */}
+          <rect x="396" y="24" width="200" height="92" rx="6" fill="#F4F7FC" stroke="#2E5D9B" strokeWidth="2" />
+          <text x="496" y="57" textAnchor="middle" fill="#2E5D9B" fontSize="14" fontFamily="Space Grotesk" fontWeight="700">SGP4 Engine</text>
+          <text x="496" y="79" textAnchor="middle" fill="#586878" fontSize="12" fontFamily="DM Sans">Position &amp; velocity</text>
+          <text x="496" y="96" textAnchor="middle" fill="#9AAABB" fontSize="11" fontFamily="DM Sans">propagation</text>
 
-          {/* Arrow 3 → 4 */}
-          <line x1="545" y1="80" x2="580" y2="80" stroke="#E8A020" strokeWidth="2" markerEnd="url(#arrowhead)" />
+          <line x1="596" y1="70" x2="630" y2="70" stroke="#9B6824" strokeWidth="2" markerEnd="url(#arr)" />
 
-          {/* Box 4 — Risk Engine */}
-          <rect x="580" y="40" width="155" height="80" rx="6" fill="#0F2040" stroke="#1B6CA8" strokeWidth="1.5" />
-          <text x="657" y="72" textAnchor="middle" fill="#EDF2F7" fontSize="15" fontFamily="Space Grotesk" fontWeight="700">Risk Engine</text>
-          <text x="657" y="95" textAnchor="middle" fill="#7A90A8" fontSize="12" fontFamily="DM Sans">5-factor scoring</text>
-          <text x="657" y="112" textAnchor="middle" fill="#4A6080" fontSize="11" fontFamily="DM Sans">0–100 scale</text>
+          {/* Box 4 */}
+          <rect x="630" y="30" width="160" height="80" rx="6" fill="#FFFFFF" stroke="#CBD8E8" strokeWidth="1.5" />
+          <text x="710" y="62" textAnchor="middle" fill="#1B2B44" fontSize="14" fontFamily="Space Grotesk" fontWeight="700">Risk Engine</text>
+          <text x="710" y="84" textAnchor="middle" fill="#586878" fontSize="12" fontFamily="DM Sans">5-factor scoring</text>
+          <text x="710" y="101" textAnchor="middle" fill="#9AAABB" fontSize="11" fontFamily="DM Sans">0–100 scale</text>
 
-          {/* Arrow 4 → 5 */}
-          <line x1="735" y1="80" x2="770" y2="80" stroke="#E8A020" strokeWidth="2" markerEnd="url(#arrowhead)" />
+          <line x1="790" y1="70" x2="824" y2="70" stroke="#9B6824" strokeWidth="2" markerEnd="url(#arr)" />
 
-          {/* Box 5 — Dashboard */}
-          <rect x="770" y="40" width="220" height="80" rx="6" fill="#0F2040" stroke="#1B6CA8" strokeWidth="1.5" />
-          <text x="880" y="72" textAnchor="middle" fill="#EDF2F7" fontSize="15" fontFamily="Space Grotesk" fontWeight="700">OIP Dashboard</text>
-          <text x="880" y="95" textAnchor="middle" fill="#7A90A8" fontSize="12" fontFamily="DM Sans">Analytics, risk table,</text>
-          <text x="880" y="112" textAnchor="middle" fill="#4A6080" fontSize="11" fontFamily="DM Sans">collision forecast</text>
+          {/* Box 5 */}
+          <rect x="824" y="30" width="168" height="80" rx="6" fill="#FFFFFF" stroke="#CBD8E8" strokeWidth="1.5" />
+          <text x="908" y="62" textAnchor="middle" fill="#1B2B44" fontSize="14" fontFamily="Space Grotesk" fontWeight="700">OIP Dashboard</text>
+          <text x="908" y="84" textAnchor="middle" fill="#586878" fontSize="12" fontFamily="DM Sans">Analytics, risk table,</text>
+          <text x="908" y="101" textAnchor="middle" fill="#9AAABB" fontSize="11" fontFamily="DM Sans">collision forecast</text>
 
-          {/* Step labels below boxes */}
-          <text x="87" y="158" textAnchor="middle" fill="#1B6CA8" fontSize="11" fontFamily="Space Grotesk" fontWeight="600">DATA SOURCE</text>
-          <text x="277" y="158" textAnchor="middle" fill="#1B6CA8" fontSize="11" fontFamily="Space Grotesk" fontWeight="600">INGESTION</text>
-          <text x="467" y="158" textAnchor="middle" fill="#E8A020" fontSize="11" fontFamily="Space Grotesk" fontWeight="600">COMPUTATION</text>
-          <text x="657" y="158" textAnchor="middle" fill="#1B6CA8" fontSize="11" fontFamily="Space Grotesk" fontWeight="600">ANALYSIS</text>
-          <text x="880" y="158" textAnchor="middle" fill="#1B6CA8" fontSize="11" fontFamily="Space Grotesk" fontWeight="600">VISUALIZATION</text>
+          {/* Step labels */}
+          <text x="88" y="148" textAnchor="middle" fill="#2E5D9B" fontSize="10" fontFamily="Space Grotesk" fontWeight="600">DATA SOURCE</text>
+          <text x="282" y="148" textAnchor="middle" fill="#2E5D9B" fontSize="10" fontFamily="Space Grotesk" fontWeight="600">INGESTION</text>
+          <text x="496" y="148" textAnchor="middle" fill="#9B6824" fontSize="10" fontFamily="Space Grotesk" fontWeight="600">COMPUTATION</text>
+          <text x="710" y="148" textAnchor="middle" fill="#2E5D9B" fontSize="10" fontFamily="Space Grotesk" fontWeight="600">ANALYSIS</text>
+          <text x="908" y="148" textAnchor="middle" fill="#2E5D9B" fontSize="10" fontFamily="Space Grotesk" fontWeight="600">VISUALIZATION</text>
         </svg>
       </div>
     </div>

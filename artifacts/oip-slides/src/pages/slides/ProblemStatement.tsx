@@ -2,33 +2,32 @@ export default function ProblemStatement() {
   return (
     <div
       className="relative w-screen h-screen overflow-hidden"
-      style={{ background: "#0A1628" }}
+      style={{ background: "#EEF2F8" }}
     >
-      {/* Left amber accent bar */}
+      {/* Left accent bar */}
       <div
         className="absolute left-0 top-0 bottom-0"
-        style={{ width: "0.4vw", background: "#E8A020" }}
+        style={{ width: "0.35vw", background: "#9B6824" }}
       />
 
-      {/* Slide number badge — top right */}
+      {/* Slide number badge */}
       <div
         className="absolute flex items-center justify-center"
         style={{
-          top: "3.5vh",
-          right: "5vw",
-          background: "rgba(232, 160, 32, 0.12)",
-          border: "1px solid rgba(232, 160, 32, 0.35)",
+          top: "3vh",
+          right: "4vw",
+          background: "rgba(155, 104, 36, 0.08)",
+          border: "1px solid rgba(155, 104, 36, 0.25)",
           borderRadius: "4px",
-          padding: "0.5vh 1.2vw",
+          padding: "0.4vh 1vw",
         }}
       >
         <span
           style={{
             fontFamily: "var(--font-display-family)",
-            fontSize: "1.8vw",
+            fontSize: "1.5vw",
             fontWeight: 600,
-            color: "#E8A020",
-            letterSpacing: "0.1em",
+            color: "#9B6824",
           }}
         >
           01 / 05
@@ -37,103 +36,93 @@ export default function ProblemStatement() {
 
       {/* Left column */}
       <div
-        className="absolute flex flex-col justify-start"
-        style={{ left: "7vw", top: "6vh", bottom: "6vh", width: "50vw" }}
+        className="absolute flex flex-col"
+        style={{ left: "6vw", top: "5vh", bottom: "5vh", width: "50vw" }}
       >
-        {/* Section label */}
         <div
           style={{
             fontFamily: "var(--font-display-family)",
-            fontSize: "1.6vw",
+            fontSize: "1.3vw",
             fontWeight: 600,
-            letterSpacing: "0.18em",
-            color: "#1B6CA8",
-            marginBottom: "1.5vh",
+            letterSpacing: "0.12em",
+            color: "#2E5D9B",
+            marginBottom: "1.2vh",
             textTransform: "uppercase",
           }}
         >
           Problem Statement
         </div>
 
-        {/* Category badge */}
         <div
           style={{
             display: "inline-block",
-            background: "rgba(27, 108, 168, 0.15)",
-            border: "1px solid rgba(27, 108, 168, 0.4)",
+            background: "rgba(46, 93, 155, 0.07)",
+            border: "1px solid rgba(46, 93, 155, 0.2)",
             borderRadius: "4px",
-            padding: "0.5vh 1.2vw",
-            marginBottom: "2.5vh",
+            padding: "0.4vh 1vw",
+            marginBottom: "1.8vh",
             alignSelf: "flex-start",
           }}
         >
           <span
             style={{
               fontFamily: "var(--font-body-family)",
-              fontSize: "1.8vw",
+              fontSize: "1.5vw",
               fontWeight: 500,
-              color: "#7AB8DC",
+              color: "#2E5D9B",
             }}
           >
             Category: Software&nbsp;&nbsp;|&nbsp;&nbsp;Space Technology
           </span>
         </div>
 
-        {/* Title */}
         <h2
           style={{
             fontFamily: "var(--font-display-family)",
-            fontSize: "4.8vw",
+            fontSize: "3.8vw",
             fontWeight: 700,
             lineHeight: 1.1,
-            letterSpacing: "-0.02em",
-            color: "#EDF2F7",
-            marginBottom: "2vh",
-            textWrap: "balance",
+            letterSpacing: "-0.01em",
+            color: "#1B2B44",
+            marginBottom: "1.5vh",
           }}
         >
           The Space Debris Crisis
         </h2>
 
-        {/* Brief description */}
         <p
           style={{
             fontFamily: "var(--font-body-family)",
-            fontSize: "2.4vw",
+            fontSize: "1.9vw",
             fontWeight: 400,
-            lineHeight: 1.5,
-            color: "#7A90A8",
-            marginBottom: "3.5vh",
-            textWrap: "pretty",
+            lineHeight: 1.35,
+            color: "#586878",
+            marginBottom: "2.5vh",
           }}
         >
           Orbital congestion is accelerating. Operators lack a unified,
-          real-time tool to monitor risk, track debris, and predict conjunction events.
+          real-time tool to monitor risk and predict conjunction events.
         </p>
 
-        {/* Problem bullets */}
-        <div className="flex flex-col" style={{ gap: "1.8vh" }}>
+        <div className="flex flex-col" style={{ gap: "1.5vh" }}>
           {/* Problem 1 */}
-          <div
-            className="flex items-start"
-            style={{ gap: "1.5vw" }}
-          >
+          <div className="flex items-start" style={{ gap: "1.2vw" }}>
             <div
               className="flex items-center justify-center flex-shrink-0"
               style={{
-                width: "3.2vw",
-                height: "3.2vw",
-                background: "rgba(232, 160, 32, 0.15)",
-                border: "1px solid rgba(232, 160, 32, 0.4)",
+                width: "2.8vw",
+                height: "2.8vw",
+                background: "rgba(155, 104, 36, 0.1)",
+                border: "1px solid rgba(155, 104, 36, 0.3)",
                 borderRadius: "4px",
               }}
             >
               <span
                 style={{
                   fontFamily: "var(--font-display-family)",
-                  fontSize: "1.8vw",
+                  fontSize: "1.5vw",
                   fontWeight: 700,
-                  color: "#E8A020",
+                  color: "#9B6824",
                 }}
               >
                 01
@@ -143,10 +132,10 @@ export default function ProblemStatement() {
               <div
                 style={{
                   fontFamily: "var(--font-display-family)",
-                  fontSize: "2.4vw",
+                  fontSize: "2vw",
                   fontWeight: 600,
-                  color: "#EDF2F7",
-                  marginBottom: "0.4vh",
+                  color: "#1B2B44",
+                  marginBottom: "0.3vh",
                 }}
               >
                 Orbital Congestion
@@ -154,37 +143,34 @@ export default function ProblemStatement() {
               <div
                 style={{
                   fontFamily: "var(--font-body-family)",
-                  fontSize: "2.1vw",
-                  color: "#7A90A8",
-                  lineHeight: 1.4,
+                  fontSize: "1.8vw",
+                  color: "#586878",
+                  lineHeight: 1.3,
                 }}
               >
-                LEO is nearing unsustainable density — tracked objects have tripled since 2019
+                LEO tracked objects have tripled since 2019 — approaching unsustainable density
               </div>
             </div>
           </div>
 
           {/* Problem 2 */}
-          <div
-            className="flex items-start"
-            style={{ gap: "1.5vw" }}
-          >
+          <div className="flex items-start" style={{ gap: "1.2vw" }}>
             <div
               className="flex items-center justify-center flex-shrink-0"
               style={{
-                width: "3.2vw",
-                height: "3.2vw",
-                background: "rgba(232, 160, 32, 0.15)",
-                border: "1px solid rgba(232, 160, 32, 0.4)",
+                width: "2.8vw",
+                height: "2.8vw",
+                background: "rgba(155, 104, 36, 0.1)",
+                border: "1px solid rgba(155, 104, 36, 0.3)",
                 borderRadius: "4px",
               }}
             >
               <span
                 style={{
                   fontFamily: "var(--font-display-family)",
-                  fontSize: "1.8vw",
+                  fontSize: "1.5vw",
                   fontWeight: 700,
-                  color: "#E8A020",
+                  color: "#9B6824",
                 }}
               >
                 02
@@ -194,10 +180,10 @@ export default function ProblemStatement() {
               <div
                 style={{
                   fontFamily: "var(--font-display-family)",
-                  fontSize: "2.4vw",
+                  fontSize: "2vw",
                   fontWeight: 600,
-                  color: "#EDF2F7",
-                  marginBottom: "0.4vh",
+                  color: "#1B2B44",
+                  marginBottom: "0.3vh",
                 }}
               >
                 Fragmented Tools
@@ -205,9 +191,9 @@ export default function ProblemStatement() {
               <div
                 style={{
                   fontFamily: "var(--font-body-family)",
-                  fontSize: "2.1vw",
-                  color: "#7A90A8",
-                  lineHeight: 1.4,
+                  fontSize: "1.8vw",
+                  color: "#586878",
+                  lineHeight: 1.3,
                 }}
               >
                 TLE feeds, risk scores, and debris catalogs exist in isolated, disconnected systems
@@ -216,26 +202,23 @@ export default function ProblemStatement() {
           </div>
 
           {/* Problem 3 */}
-          <div
-            className="flex items-start"
-            style={{ gap: "1.5vw" }}
-          >
+          <div className="flex items-start" style={{ gap: "1.2vw" }}>
             <div
               className="flex items-center justify-center flex-shrink-0"
               style={{
-                width: "3.2vw",
-                height: "3.2vw",
-                background: "rgba(232, 160, 32, 0.15)",
-                border: "1px solid rgba(232, 160, 32, 0.4)",
+                width: "2.8vw",
+                height: "2.8vw",
+                background: "rgba(155, 104, 36, 0.1)",
+                border: "1px solid rgba(155, 104, 36, 0.3)",
                 borderRadius: "4px",
               }}
             >
               <span
                 style={{
                   fontFamily: "var(--font-display-family)",
-                  fontSize: "1.8vw",
+                  fontSize: "1.5vw",
                   fontWeight: 700,
-                  color: "#E8A020",
+                  color: "#9B6824",
                 }}
               >
                 03
@@ -245,10 +228,10 @@ export default function ProblemStatement() {
               <div
                 style={{
                   fontFamily: "var(--font-display-family)",
-                  fontSize: "2.4vw",
+                  fontSize: "2vw",
                   fontWeight: 600,
-                  color: "#EDF2F7",
-                  marginBottom: "0.4vh",
+                  color: "#1B2B44",
+                  marginBottom: "0.3vh",
                 }}
               >
                 Reactive, Not Predictive
@@ -256,9 +239,9 @@ export default function ProblemStatement() {
               <div
                 style={{
                   fontFamily: "var(--font-body-family)",
-                  fontSize: "2.1vw",
-                  color: "#7A90A8",
-                  lineHeight: 1.4,
+                  fontSize: "1.8vw",
+                  color: "#586878",
+                  lineHeight: 1.3,
                 }}
               >
                 No integrated platform predicts collision risk before conjunction events occur
@@ -271,25 +254,26 @@ export default function ProblemStatement() {
       {/* Right column — stat cards */}
       <div
         className="absolute flex flex-col justify-center"
-        style={{ right: "5vw", top: "6vh", bottom: "6vh", width: "31vw", gap: "2.5vh" }}
+        style={{ right: "4vw", top: "5vh", bottom: "5vh", width: "31vw", gap: "2vh" }}
       >
         {/* Stat card 1 */}
         <div
           style={{
-            background: "rgba(15, 32, 64, 0.9)",
-            border: "1px solid rgba(27, 108, 168, 0.4)",
+            background: "#FFFFFF",
+            border: "1px solid rgba(46, 93, 155, 0.2)",
             borderRadius: "8px",
-            padding: "3vh 2.5vw",
+            padding: "2.2vh 2vw",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
           }}
         >
           <div
             style={{
               fontFamily: "var(--font-display-family)",
-              fontSize: "4.5vw",
+              fontSize: "3.8vw",
               fontWeight: 700,
-              color: "#E8A020",
+              color: "#9B6824",
               lineHeight: 1,
-              marginBottom: "0.8vh",
+              marginBottom: "0.6vh",
             }}
           >
             27,000+
@@ -297,8 +281,9 @@ export default function ProblemStatement() {
           <div
             style={{
               fontFamily: "var(--font-body-family)",
-              fontSize: "2.1vw",
-              color: "#7A90A8",
+              fontSize: "1.8vw",
+              color: "#1B2B44",
+              marginBottom: "0.4vh",
             }}
           >
             Tracked objects in Earth orbit
@@ -306,9 +291,8 @@ export default function ProblemStatement() {
           <div
             style={{
               fontFamily: "var(--font-body-family)",
-              fontSize: "1.8vw",
-              color: "#4A6080",
-              marginTop: "0.5vh",
+              fontSize: "1.4vw",
+              color: "#9AAABB",
             }}
           >
             Source: ESA Space Debris Office
@@ -318,20 +302,21 @@ export default function ProblemStatement() {
         {/* Stat card 2 */}
         <div
           style={{
-            background: "rgba(15, 32, 64, 0.9)",
-            border: "1px solid rgba(27, 108, 168, 0.4)",
+            background: "#FFFFFF",
+            border: "1px solid rgba(46, 93, 155, 0.2)",
             borderRadius: "8px",
-            padding: "3vh 2.5vw",
+            padding: "2.2vh 2vw",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
           }}
         >
           <div
             style={{
               fontFamily: "var(--font-display-family)",
-              fontSize: "4.5vw",
+              fontSize: "3.8vw",
               fontWeight: 700,
-              color: "#E8A020",
+              color: "#9B6824",
               lineHeight: 1,
-              marginBottom: "0.8vh",
+              marginBottom: "0.6vh",
             }}
           >
             100M+
@@ -339,8 +324,9 @@ export default function ProblemStatement() {
           <div
             style={{
               fontFamily: "var(--font-body-family)",
-              fontSize: "2.1vw",
-              color: "#7A90A8",
+              fontSize: "1.8vw",
+              color: "#1B2B44",
+              marginBottom: "0.4vh",
             }}
           >
             Untracked debris fragments below 10 cm
@@ -348,9 +334,8 @@ export default function ProblemStatement() {
           <div
             style={{
               fontFamily: "var(--font-body-family)",
-              fontSize: "1.8vw",
-              color: "#4A6080",
-              marginTop: "0.5vh",
+              fontSize: "1.4vw",
+              color: "#9AAABB",
             }}
           >
             Source: NASA Orbital Debris Program
@@ -360,20 +345,21 @@ export default function ProblemStatement() {
         {/* Stat card 3 */}
         <div
           style={{
-            background: "rgba(15, 32, 64, 0.9)",
-            border: "1px solid rgba(27, 108, 168, 0.4)",
+            background: "#FFFFFF",
+            border: "1px solid rgba(46, 93, 155, 0.2)",
             borderRadius: "8px",
-            padding: "3vh 2.5vw",
+            padding: "2.2vh 2vw",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
           }}
         >
           <div
             style={{
               fontFamily: "var(--font-display-family)",
-              fontSize: "4.5vw",
+              fontSize: "3.8vw",
               fontWeight: 700,
-              color: "#E8A020",
+              color: "#9B6824",
               lineHeight: 1,
-              marginBottom: "0.8vh",
+              marginBottom: "0.6vh",
             }}
           >
             9,000+
@@ -381,18 +367,18 @@ export default function ProblemStatement() {
           <div
             style={{
               fontFamily: "var(--font-body-family)",
-              fontSize: "2.1vw",
-              color: "#7A90A8",
+              fontSize: "1.8vw",
+              color: "#1B2B44",
+              marginBottom: "0.4vh",
             }}
           >
-            Active and inactive satellites currently in orbit
+            Active and inactive satellites in orbit
           </div>
           <div
             style={{
               fontFamily: "var(--font-body-family)",
-              fontSize: "1.8vw",
-              color: "#4A6080",
-              marginTop: "0.5vh",
+              fontSize: "1.4vw",
+              color: "#9AAABB",
             }}
           >
             Source: UCS Satellite Database, 2024
