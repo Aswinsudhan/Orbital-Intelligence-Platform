@@ -29,12 +29,7 @@ const corsOrigin = process.env.CORS_ORIGIN;
 app.use(cors(corsOrigin ? { origin: corsOrigin } : {}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.get("/", (req, res) => {
-  res.json({
-    name: "Orbital Intelligence Platform API",
-    status: "online",
-  });
-});
+
 app.use("/api", router);
 
 logger.info("Auto-sync disabled — data refresh is manual only via Admin panel");
