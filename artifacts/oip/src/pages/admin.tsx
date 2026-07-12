@@ -65,27 +65,51 @@ export default function Admin() {
         setTimeout(() => { refetchStatus(); refetchLastUpdate(); }, 3000);
       },
       onError: (error: any) => {
-        toast({ title: "Sync Failed", description: error?.response?.data?.error || "Unknown error", variant: "destructive" });
-      },
-    },
+        const errorMsg =
+          error?.data?.error ||
+          error?.data?.message ||
+          error?.message ||
+          "An unknown error occurred during sync.";
+        toast({
+          title: "Refresh Failed",
+          description: errorMsg,
+          variant: "destructive"
+        });
+      }
+    }
   });
 
   const [schedulerPending, setSchedulerPending] = useState(false);
 
+  const getBaseApiUrl = () => (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/+$/, "") || "";
+
   const enableScheduler = async () => {
     setSchedulerPending(true);
     try {
-      const res = await fetch("/api/admin/scheduler/enable", {
+      const baseUrl = getBaseApiUrl();
+      const res = await fetch(`${baseUrl}/api/admin/scheduler/enable`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ intervalMinutes: selectedInterval }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      toast({ title: "Auto-Sync Enabled", description: data.message });
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("text/html")) {
+        throw new Error("Received HTML response instead of JSON. Ensure VITE_API_URL environment variable is set or proxy redirect rule is active.");
+      }
+      const rawText = await res.text();
+      let data: any = {};
+      if (rawText.trim()) {
+        try {
+          data = JSON.parse(rawText);
+        } catch {
+          throw new Error(`Invalid response format from server: ${rawText.slice(0, 100)}`);
+        }
+      }
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+      toast({ title: "Auto-Sync Enabled", description: data.message || "Auto sync schedule updated." });
       refetchStatus();
     } catch (e: any) {
-      toast({ title: "Error", description: e.message, variant: "destructive" });
+      toast({ title: "Auto-Sync Error", description: e.message, variant: "destructive" });
     } finally {
       setSchedulerPending(false);
     }
@@ -94,13 +118,26 @@ export default function Admin() {
   const disableScheduler = async () => {
     setSchedulerPending(true);
     try {
-      const res = await fetch("/api/admin/scheduler/disable", { method: "POST" });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      toast({ title: "Auto-Sync Disabled", description: data.message });
+      const baseUrl = getBaseApiUrl();
+      const res = await fetch(`${baseUrl}/api/admin/scheduler/disable`, { method: "POST" });
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("text/html")) {
+        throw new Error("Received HTML response instead of JSON. Ensure VITE_API_URL environment variable is set or proxy redirect rule is active.");
+      }
+      const rawText = await res.text();
+      let data: any = {};
+      if (rawText.trim()) {
+        try {
+          data = JSON.parse(rawText);
+        } catch {
+          throw new Error(`Invalid response format from server: ${rawText.slice(0, 100)}`);
+        }
+      }
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+      toast({ title: "Auto-Sync Disabled", description: data.message || "Auto sync stopped." });
       refetchStatus();
     } catch (e: any) {
-      toast({ title: "Error", description: e.message, variant: "destructive" });
+      toast({ title: "Auto-Sync Error", description: e.message, variant: "destructive" });
     } finally {
       setSchedulerPending(false);
     }

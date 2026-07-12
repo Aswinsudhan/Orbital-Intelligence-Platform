@@ -15,7 +15,17 @@ const DEFAULT_JSON_ACCEPT = "application/json, application/problem+json";
 // Module-level configuration
 // ---------------------------------------------------------------------------
 
-let _baseUrl: string | null = null;
+const getInitialBaseUrl = (): string | null => {
+  if (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_API_URL) {
+    return (import.meta.env.VITE_API_URL as string).replace(/\/+$/, "");
+  }
+  if (typeof window !== "undefined" && (window as any).VITE_API_URL) {
+    return (window as any).VITE_API_URL.replace(/\/+$/, "");
+  }
+  return null;
+};
+
+let _baseUrl: string | null = getInitialBaseUrl();
 let _authTokenGetter: AuthTokenGetter | null = null;
 
 /**
@@ -47,6 +57,7 @@ export function setAuthTokenGetter(getter: AuthTokenGetter | null): void {
 function isRequest(input: RequestInfo | URL): input is Request {
   return typeof Request !== "undefined" && input instanceof Request;
 }
+
 
 function resolveMethod(input: RequestInfo | URL, explicitMethod?: string): string {
   if (explicitMethod) return explicitMethod.toUpperCase();
@@ -247,6 +258,14 @@ async function parseJsonBody(
   try {
     return JSON.parse(normalized);
   } catch (cause) {
+    if (normalized.startsWith("<!DOCTYPE") || normalized.includes("<html")) {
+      throw new ResponseParseError(
+        response,
+        raw,
+        new Error("Received HTML response instead of JSON. Ensure VITE_API_URL is configured or redirect rules are active."),
+        requestInfo,
+      );
+    }
     throw new ResponseParseError(response, raw, cause, requestInfo);
   }
 }

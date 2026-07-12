@@ -143,9 +143,23 @@ function useLaunches(tab: "upcoming" | "recent") {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetch(`/api/launches/${tab}?limit=25`)
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+
+    const baseUrl = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/+$/, "") || "";
+    const endpoint = `${baseUrl}/api/launches/${tab}?limit=25`;
+
+    fetch(endpoint)
+      .then(async (r) => {
+        if (!r.ok) {
+          const text = await r.text().catch(() => "");
+          throw new Error(`HTTP ${r.status}${text ? `: ${text.slice(0, 100)}` : ""}`);
+        }
+        const contentType = r.headers.get("content-type");
+        if (contentType && contentType.includes("text/html")) {
+          const text = await r.text().catch(() => "");
+          if (text.startsWith("<!DOCTYPE") || text.includes("<html")) {
+            throw new Error("Received HTML response instead of JSON. Make sure VITE_API_URL environment variable is set or proxy redirect rule is active.");
+          }
+        }
         return r.json();
       })
       .then((d) => { setData(d); setLoading(false); })
