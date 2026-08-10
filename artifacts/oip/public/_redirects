@@ -1,4 +1,3 @@
 # Cloudflare Pages Redirect / Proxy Rules
 # Proxy all /api requests to Render backend server
-# Replace the URL below if your Render service URL differs
-/api/*  https://orbital-intelligence-platform-api.onrender.com/api/:splat  200
+/api/*  https://orbital-intelligence-platform.onrender.com/api/:splat  200
