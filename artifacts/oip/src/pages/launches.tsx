@@ -60,21 +60,28 @@ function Countdown({ target }: { target: string }) {
   );
 }
 
+const DEFAULT_FALLBACK_IMG = "https://images.unsplash.com/photo-1517976487492-5750f3195933?auto=format&fit=crop&w=800&q=80";
+
 function LaunchCard({ launch, upcoming }: { launch: Launch; upcoming: boolean }) {
   const date = new Date(launch.launchTime);
+  const imgSrc = launch.image || DEFAULT_FALLBACK_IMG;
+
   return (
     <Card className="overflow-hidden hover:border-primary/40 transition-colors">
       <div className="flex flex-col sm:flex-row">
-        {launch.image && (
-          <div className="sm:w-48 h-36 sm:h-auto shrink-0 overflow-hidden bg-muted">
-            <img
-              src={launch.image}
-              alt={launch.name}
-              className="w-full h-full object-cover"
-              onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-            />
-          </div>
-        )}
+        <div className="sm:w-52 h-44 sm:h-auto shrink-0 overflow-hidden bg-muted relative">
+          <img
+            src={imgSrc}
+            alt={launch.name}
+            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              if (target.src !== DEFAULT_FALLBACK_IMG) {
+                target.src = DEFAULT_FALLBACK_IMG;
+              }
+            }}
+          />
+        </div>
         <CardContent className="p-4 flex-1 space-y-3">
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div>
@@ -145,7 +152,7 @@ function useLaunches(tab: "upcoming" | "recent") {
     setError(null);
 
     const baseUrl = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/+$/, "") || "";
-    const endpoint = `${baseUrl}/api/launches/${tab}?limit=25`;
+    const endpoint = `${baseUrl}/api/launches/${tab}?limit=30`;
 
     fetch(endpoint)
       .then(async (r) => {

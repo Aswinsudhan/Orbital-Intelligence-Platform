@@ -91,11 +91,6 @@ export default function Landing() {
               Launch Dashboard
             </Link>
           </Button>
-          <Button asChild variant="outline" size="lg" className="w-full sm:w-auto text-lg px-8 h-14 border-white/20 hover:border-white/40 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all">
-            <Link href="/satellites">
-              View Catalog
-            </Link>
-          </Button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-16 text-left">
