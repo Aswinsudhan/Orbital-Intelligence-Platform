@@ -7,6 +7,7 @@ import riskRouter from "./risk";
 import collisionsRouter from "./collisions";
 import launchesRouter from "./launches";
 import adminRouter from "./admin";
+import orbitalRouter from "./orbital";
 
 const router: IRouter = Router();
 
@@ -17,6 +18,7 @@ router.use("/analytics", analyticsRouter);
 router.use("/risk", riskRouter);
 router.use("/collisions", collisionsRouter);
 router.use("/launches", launchesRouter);
+router.use(orbitalRouter);
 router.use(adminRouter);
 
 export default router;

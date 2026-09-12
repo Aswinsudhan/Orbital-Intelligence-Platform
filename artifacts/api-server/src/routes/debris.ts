@@ -17,8 +17,9 @@ router.get("/", async (req, res) => {
       limit = 50,
     } = params;
 
-    const pageNum = Math.max(1, Number(page));
-    const limitNum = Math.min(200, Math.max(1, Number(limit)));
+    const pageNum = Math.max(1, Number(page || req.query.page || 1));
+    const limitParam = Number(limit || req.query.limit || 50);
+    const limitNum = Math.min(2000, Math.max(1, limitParam));
     const offset = (pageNum - 1) * limitNum;
 
     const conditions = [];
@@ -66,6 +67,8 @@ router.get("/", async (req, res) => {
         inclination: d.inclination,
         eccentricity: d.eccentricity,
         epoch: d.epoch,
+        tle1: d.tle1,
+        tle2: d.tle2,
         lastUpdated: d.lastUpdated,
       })),
       total: countResult[0]?.count ?? 0,

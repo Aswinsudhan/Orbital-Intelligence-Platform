@@ -19,8 +19,9 @@ router.get("/", async (req, res) => {
       limit = 50,
     } = params;
 
-    const pageNum = Math.max(1, Number(page));
-    const limitNum = Math.min(200, Math.max(1, Number(limit)));
+    const pageNum = Math.max(1, Number(page || req.query.page || 1));
+    const limitParam = Number(limit || req.query.limit || 50);
+    const limitNum = Math.min(2000, Math.max(1, limitParam));
     const offset = (pageNum - 1) * limitNum;
 
     const conditions = [];
@@ -75,6 +76,8 @@ router.get("/", async (req, res) => {
         eccentricity: s.eccentricity,
         raan: s.raan,
         epoch: s.epoch,
+        tle1: s.tle1,
+        tle2: s.tle2,
         lastUpdated: s.lastUpdated,
       })),
       total: countResult[0]?.count ?? 0,
@@ -89,8 +92,8 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
-    const parsed = GetSatelliteParams.safeParse({ id: parseInt(req.params.id, 10) });
-    if (!parsed.success) {
+    const rawId = parseInt(req.params.id, 10);
+    if (isNaN(rawId)) {
       res.status(400).json({ error: "Invalid ID" });
       return;
     }
@@ -98,7 +101,7 @@ router.get("/:id", async (req, res) => {
     const [sat] = await db
       .select()
       .from(satellitesTable)
-      .where(eq(satellitesTable.id, parsed.data.id));
+      .where(or(eq(satellitesTable.id, rawId), eq(satellitesTable.noradId, rawId)));
 
     if (!sat) {
       res.status(404).json({ error: "Satellite not found" });
@@ -121,6 +124,8 @@ router.get("/:id", async (req, res) => {
       eccentricity: sat.eccentricity,
       raan: sat.raan,
       epoch: sat.epoch,
+      tle1: sat.tle1,
+      tle2: sat.tle2,
       lastUpdated: sat.lastUpdated,
       riskScore: riskScore?.score ?? null,
       riskCategory: riskScore?.category ?? null,

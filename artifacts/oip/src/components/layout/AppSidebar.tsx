@@ -14,6 +14,7 @@ import {
   Rocket,
   LayoutDashboard,
   Satellite,
+  Globe,
   Trash2,
   LineChart,
   TrendingUp,
@@ -30,6 +31,7 @@ export function AppSidebar() {
   const navItems = [
     { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
     { title: "Satellites", url: "/satellites", icon: Satellite },
+    { title: "Live Orbital View", url: "/live-orbital-view", icon: Globe },
     { title: "Debris", url: "/debris", icon: Trash2 },
     { title: "Analytics", url: "/analytics", icon: LineChart },
     { title: "Forecast", url: "/analytics/forecast", icon: TrendingUp },

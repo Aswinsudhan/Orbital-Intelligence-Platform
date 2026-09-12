@@ -16,8 +16,9 @@ const DEFAULT_JSON_ACCEPT = "application/json, application/problem+json";
 // ---------------------------------------------------------------------------
 
 const getInitialBaseUrl = (): string | null => {
-  if (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_API_URL) {
-    return (import.meta.env.VITE_API_URL as string).replace(/\/+$/, "");
+  const metaEnv = (import.meta as any)?.env;
+  if (metaEnv && metaEnv.VITE_API_URL) {
+    return (metaEnv.VITE_API_URL as string).replace(/\/+$/, "");
   }
   if (typeof window !== "undefined" && (window as any).VITE_API_URL) {
     return (window as any).VITE_API_URL.replace(/\/+$/, "");

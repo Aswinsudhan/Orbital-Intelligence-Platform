@@ -18,6 +18,7 @@ import Collisions from "@/pages/collisions";
 import Admin from "@/pages/admin";
 import About from "@/pages/about";
 import Launches from "@/pages/launches";
+import LiveOrbitalView from "@/pages/live-orbital-view";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,9 @@ function Router() {
         </Route>
         <Route path="/satellites">
           <Layout><Satellites /></Layout>
+        </Route>
+        <Route path="/live-orbital-view">
+          <Layout><LiveOrbitalView /></Layout>
         </Route>
         <Route path="/debris">
           <Layout><Debris /></Layout>
