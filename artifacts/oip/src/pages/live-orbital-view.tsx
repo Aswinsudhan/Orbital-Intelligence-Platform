@@ -306,7 +306,7 @@ export default function LiveOrbitalView() {
         const posVel = satellite.propagate(obj.satrec, now);
         if (!posVel || !posVel.position || typeof posVel.position === "boolean") return;
 
-        const geo = satellite.eciToGeodetic(posVel.position as satellite.EciVec3<satellite.Kilometer>, gmst);
+        const geo = satellite.eciToGeodetic(posVel.position as satellite.EciVec3<number>, gmst);
         const lonDeg = satellite.degreesLong(geo.longitude);
         const latDeg = satellite.degreesLat(geo.latitude);
         const heightMeters = geo.height * 1000;
@@ -359,7 +359,7 @@ export default function LiveOrbitalView() {
         try {
           const posVel = satellite.propagate(obj.satrec, now);
           if (posVel && posVel.position && typeof posVel.position !== "boolean") {
-            const geo = satellite.eciToGeodetic(posVel.position as satellite.EciVec3<satellite.Kilometer>, gmst);
+            const geo = satellite.eciToGeodetic(posVel.position as satellite.EciVec3<number>, gmst);
             const lonDeg = satellite.degreesLong(geo.longitude);
             const latDeg = satellite.degreesLat(geo.latitude);
             const altKm = geo.height;
@@ -370,7 +370,7 @@ export default function LiveOrbitalView() {
             if (selectedObject?.noradId === noradId) {
               let velKmS = obj.velocity ?? 7.5;
               if (posVel && posVel.velocity && typeof posVel.velocity !== "boolean") {
-                const v = posVel.velocity as satellite.EciVec3<satellite.KilometerPerSecond>;
+                const v = posVel.velocity as satellite.EciVec3<number>;
                 velKmS = Math.round(Math.sqrt(v.x ** 2 + v.y ** 2 + v.z ** 2) * 100) / 100;
               }
               setSelectedPos({
@@ -425,7 +425,7 @@ export default function LiveOrbitalView() {
       const posVel = satellite.propagate(satrec, time);
 
       if (posVel && posVel.position && typeof posVel.position !== "boolean") {
-        const geo = satellite.eciToGeodetic(posVel.position as satellite.EciVec3<satellite.Kilometer>, gmst);
+        const geo = satellite.eciToGeodetic(posVel.position as satellite.EciVec3<number>, gmst);
         const lonDeg = satellite.degreesLong(geo.longitude);
         const latDeg = satellite.degreesLat(geo.latitude);
         const altMeters = geo.height * 1000;
@@ -482,7 +482,7 @@ export default function LiveOrbitalView() {
     const posVel = satellite.propagate(obj.satrec, now);
 
     if (posVel && posVel.position && typeof posVel.position !== "boolean") {
-      const geo = satellite.eciToGeodetic(posVel.position as satellite.EciVec3<satellite.Kilometer>, gmst);
+      const geo = satellite.eciToGeodetic(posVel.position as satellite.EciVec3<number>, gmst);
       const lonDeg = satellite.degreesLong(geo.longitude);
       const latDeg = satellite.degreesLat(geo.latitude);
       const altKm = geo.height;

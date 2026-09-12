@@ -46,19 +46,10 @@ export default defineConfig({
     format: "es",
   },
   build: {
-    // esnext target is required so Rollup emits native ES modules
-    // (satellite.js v7 wasm bundle uses top-level await which is
-    //  incompatible with the default "iife" Rollup output format)
+    // esnext required for modern async/await and ES modules on Cloudflare Pages
     target: "esnext",
     outDir: path.resolve(import.meta.dirname, "dist"),
     emptyOutDir: true,
-    rollupOptions: {
-      output: {
-        // Force ES module output so Cloudflare Pages can handle
-        // top-level await inside satellite.js/wasm-build chunks
-        format: "es",
-      },
-    },
   },
   server: {
     port,
