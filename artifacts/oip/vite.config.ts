@@ -41,8 +41,12 @@ export default defineConfig({
     dedupe: ["react", "react-dom"],
   },
   root: path.resolve(import.meta.dirname),
+  worker: {
+    format: "es",
+  },
   build: {
-    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    target: "esnext",
+    outDir: path.resolve(import.meta.dirname, "dist"),
     emptyOutDir: true,
   },
   server: {
