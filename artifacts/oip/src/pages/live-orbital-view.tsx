@@ -87,7 +87,7 @@ export default function LiveOrbitalView() {
       try {
         const [satRes, debrisRes] = await Promise.allSettled([
           customFetch<{ data: any[] }>("/api/satellites?limit=1000"),
-          customFetch<{ data: any[] }>("/api/debris?limit=1000"),
+          customFetch<{ data: any[] }>("/api/debris?type=all&limit=2000"),
         ]);
 
         const combined: TrackedObject[] = [];
@@ -123,16 +123,24 @@ export default function LiveOrbitalView() {
           }
         }
 
+        let debrisWithoutTle = 0;
         if (debrisRes.status === "fulfilled" && Array.isArray(debrisRes.value?.data)) {
           for (const d of debrisRes.value.data) {
-            if (!d.tle1 || !d.tle2) continue;
+            if (!d.tle1 || !d.tle2) {
+              debrisWithoutTle++;
+              continue;
+            }
             try {
               const satrec = satellite.twoline2satrec(d.tle1, d.tle2);
+              const objectType = String(d.objectType ?? "DEBRIS")
+                .trim()
+                .toUpperCase()
+                .replace(/_/g, " ");
               combined.push({
                 id: d.id ?? d.noradId,
                 noradId: d.noradId,
                 name: d.name,
-                objectType: d.objectType === "ROCKET BODY" ? "ROCKET BODY" : "DEBRIS",
+                objectType: objectType === "ROCKET BODY" ? "ROCKET BODY" : "DEBRIS",
                 orbitType: (d.altitude ?? 0) < 2000 ? "LEO" : "MEO",
                 altitude: d.altitude,
                 inclination: d.inclination,
@@ -163,6 +171,9 @@ export default function LiveOrbitalView() {
             setErrorBanner("CelesTrak data source temporarily unavailable. Showing cached orbital snapshot.");
           } else {
             setObjects(combined);
+            if (debrisWithoutTle > 0) {
+              setErrorBanner(`${debrisWithoutTle.toLocaleString()} debris or rocket-body records have no TLE data. Run a database refresh from the Render admin endpoint.`);
+            }
             setLastDataUpdate(latestTimestamp ? new Date(latestTimestamp).toUTCString() : new Date().toUTCString());
           }
         }
@@ -239,10 +250,14 @@ export default function LiveOrbitalView() {
       new Cesium.UrlTemplateImageryProvider({
         url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
         credit: "Esri, Maxar, Earthstar Geographics",
+        maximumLevel: 19,
       }),
     );
     scene.skyAtmosphere.show = true;
     scene.globe.enableLighting = true;
+    scene.globe.maximumScreenSpaceError = 1.25;
+    scene.globe.showGroundAtmosphere = true;
+    scene.postProcessStages.fxaa.enabled = true;
     scene.globe.atmosphereColor = Cesium.Color.fromCssColorString("#0ea5e9").withAlpha(0.2);
     scene.globe.atmosphereRayleighCoefficient = new Cesium.Cartesian3(5.5e-6, 13.0e-6, 28.4e-6);
 
