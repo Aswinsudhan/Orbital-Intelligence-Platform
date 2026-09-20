@@ -53,6 +53,7 @@ export default function LiveOrbitalView() {
   const pointsCollectionRef = useRef<any>(null);
   const pointPrimitiveMapRef = useRef<Map<number, any>>(new Map());
   const pathEntityRef = useRef<any>(null);
+  const [cesiumReady, setCesiumReady] = useState(false);
 
   const [objects, setObjects] = useState<TrackedObject[]>([]);
   const [loading, setLoading] = useState(true);
@@ -87,7 +88,7 @@ export default function LiveOrbitalView() {
         const [satRes, debRes, rbRes] = await Promise.allSettled([
           customFetch<{ data: any[] }>("/api/satellites?limit=1000"),
           customFetch<{ data: any[] }>("/api/debris?limit=1000"),
-          customFetch<{ data: any[] }>("/api/rocket-bodies?limit=1000"),
+          customFetch<{ data: any[] }>("/api/debris?type=rocket_body&limit=1000"),
         ]);
 
         const combined: TrackedObject[] = [];
@@ -204,9 +205,30 @@ export default function LiveOrbitalView() {
     return () => { isMounted = false; };
   }, []);
 
-  // 2. Initialize CesiumJS Viewer
+  // 2. Load CesiumJS before initializing the viewer
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (typeof window === "undefined") return;
+    if (window.Cesium) {
+      setCesiumReady(true);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://cesium.com/downloads/cesiumjs/releases/1.126/Build/Cesium/Cesium.js";
+    script.async = true;
+    script.onload = () => setCesiumReady(true);
+    script.onerror = () => setErrorBanner("3D globe library failed to load. Check the browser network policy and reload the page.");
+    document.head.appendChild(script);
+
+    return () => {
+      script.onload = null;
+      script.onerror = null;
+    };
+  }, []);
+
+  // 3. Initialize CesiumJS Viewer
+  useEffect(() => {
+    if (!containerRef.current || !cesiumReady) return;
     if (viewerRef.current) return;
 
     if (typeof window === "undefined" || !window.Cesium) {
@@ -271,9 +293,9 @@ export default function LiveOrbitalView() {
         viewerRef.current = null;
       }
     };
-  }, []);
+  }, [cesiumReady]);
 
-  // 3. Render and update object points in Cesium scene
+  // 4. Render and update object points in Cesium scene
   useEffect(() => {
     const viewer = viewerRef.current;
     const pointsCollection = pointsCollectionRef.current;
@@ -339,7 +361,7 @@ export default function LiveOrbitalView() {
     viewer.scene.requestRender();
   }, [objects, categoryFilter, orbitFilter, selectedObject]);
 
-  // 4. Real-time SGP4 position propagation loop (1-second clock tick)
+  // 5. Real-time SGP4 position propagation loop (1-second clock tick)
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -393,7 +415,7 @@ export default function LiveOrbitalView() {
     return () => clearInterval(interval);
   }, [selectedObject]);
 
-  // 5. Render 3D Orbit Path Polyline when an object is selected
+  // 6. Render 3D Orbit Path Polyline when an object is selected
   useEffect(() => {
     const viewer = viewerRef.current;
     if (!viewer || typeof window === "undefined" || !window.Cesium) return;
@@ -454,7 +476,7 @@ export default function LiveOrbitalView() {
     }
   }, [selectedObject]);
 
-  // 6. Search Bar Filter Logic
+  // 7. Search Bar Filter Logic
   useEffect(() => {
     if (!searchQuery.trim()) {
       setSearchResults([]);
@@ -467,7 +489,7 @@ export default function LiveOrbitalView() {
     setSearchResults(matches);
   }, [searchQuery, objects]);
 
-  // 7. Fly camera to selected satellite
+  // 8. Fly camera to selected satellite
   const handleSelectObject = (obj: TrackedObject) => {
     setSelectedObject(obj);
     setSearchQuery("");
@@ -488,7 +510,7 @@ export default function LiveOrbitalView() {
       const altKm = geo.height;
 
       viewer.camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(lonDeg, latDeg, (altKm + 3000) * 1000),
+        destination: Cesium.Cartesian3.fromDegrees(lonDeg, latDeg, (altKm + 3) * 1000),
         duration: 1.8,
       });
     }
