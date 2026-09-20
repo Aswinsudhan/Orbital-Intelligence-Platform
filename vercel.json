@@ -1,7 +1,7 @@
 {
-  "installCommand": "pnpm install",
+  "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "pnpm --filter @workspace/oip run build",
-  "outputDirectory": "artifacts/oip/dist/public",
+  "outputDirectory": "artifacts/oip/dist",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
