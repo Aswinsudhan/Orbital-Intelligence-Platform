@@ -85,16 +85,15 @@ export default function LiveOrbitalView() {
       setLoading(true);
       setErrorBanner(null);
       try {
-        const [satRes, debRes, rbRes] = await Promise.allSettled([
+        const [satRes, debrisRes] = await Promise.allSettled([
           customFetch<{ data: any[] }>("/api/satellites?limit=1000"),
           customFetch<{ data: any[] }>("/api/debris?limit=1000"),
-          customFetch<{ data: any[] }>("/api/debris?type=rocket_body&limit=1000"),
         ]);
 
         const combined: TrackedObject[] = [];
         let latestTimestamp = "";
 
-        if (satRes.status === "fulfilled" && satRes.value?.data) {
+        if (satRes.status === "fulfilled" && Array.isArray(satRes.value?.data)) {
           for (const s of satRes.value.data) {
             if (!s.tle1 || !s.tle2) continue;
             try {
@@ -124,8 +123,8 @@ export default function LiveOrbitalView() {
           }
         }
 
-        if (debRes.status === "fulfilled" && debRes.value?.data) {
-          for (const d of debRes.value.data) {
+        if (debrisRes.status === "fulfilled" && Array.isArray(debrisRes.value?.data)) {
+          for (const d of debrisRes.value.data) {
             if (!d.tle1 || !d.tle2) continue;
             try {
               const satrec = satellite.twoline2satrec(d.tle1, d.tle2);
@@ -133,7 +132,7 @@ export default function LiveOrbitalView() {
                 id: d.id ?? d.noradId,
                 noradId: d.noradId,
                 name: d.name,
-                objectType: "DEBRIS",
+                objectType: d.objectType === "ROCKET BODY" ? "ROCKET BODY" : "DEBRIS",
                 orbitType: (d.altitude ?? 0) < 2000 ? "LEO" : "MEO",
                 altitude: d.altitude,
                 inclination: d.inclination,
@@ -154,34 +153,9 @@ export default function LiveOrbitalView() {
           }
         }
 
-        if (rbRes.status === "fulfilled" && rbRes.value?.data) {
-          for (const r of rbRes.value.data) {
-            if (!r.tle1 || !r.tle2) continue;
-            try {
-              const satrec = satellite.twoline2satrec(r.tle1, r.tle2);
-              combined.push({
-                id: r.id ?? r.noradId,
-                noradId: r.noradId,
-                name: r.name,
-                objectType: "ROCKET BODY",
-                orbitType: (r.altitude ?? 0) < 2000 ? "LEO" : "MEO",
-                altitude: r.altitude,
-                inclination: r.inclination,
-                velocity: null,
-                eccentricity: r.eccentricity,
-                epoch: r.epoch,
-                tle1: r.tle1,
-                tle2: r.tle2,
-                lastUpdated: r.lastUpdated || new Date().toISOString(),
-                satrec,
-              });
-              if (!latestTimestamp || r.lastUpdated > latestTimestamp) {
-                latestTimestamp = r.lastUpdated;
-              }
-            } catch (err) {
-              console.warn(`[Propagation Error] Excluded rocket body ${r.noradId}:`, err);
-            }
-          }
+        const failedSources = [satRes, debrisRes].filter((result) => result.status === "rejected").length;
+        if (failedSources > 0) {
+          console.warn(`${failedSources} orbital data request(s) failed`, { satRes, debrisRes });
         }
 
         if (isMounted) {
@@ -263,8 +237,8 @@ export default function LiveOrbitalView() {
     const scene = viewer.scene;
     scene.imageryLayers.addImageryProvider(
       new Cesium.UrlTemplateImageryProvider({
-        url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-        credit: "© OpenStreetMap contributors",
+        url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        credit: "Esri, Maxar, Earthstar Geographics",
       }),
     );
     scene.skyAtmosphere.show = true;
