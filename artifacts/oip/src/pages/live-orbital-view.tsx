@@ -243,6 +243,7 @@ export default function LiveOrbitalView() {
 
     const viewer = new Cesium.Viewer(containerRef.current, {
       animation: false,
+      baseLayer: false,
       baseLayerPicker: false,
       fullscreenButton: false,
       geocoder: false,
@@ -260,6 +261,12 @@ export default function LiveOrbitalView() {
 
     // Styling Cesium environment for aerospace look
     const scene = viewer.scene;
+    scene.imageryLayers.addImageryProvider(
+      new Cesium.UrlTemplateImageryProvider({
+        url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        credit: "© OpenStreetMap contributors",
+      }),
+    );
     scene.skyAtmosphere.show = true;
     scene.globe.enableLighting = true;
     scene.globe.atmosphereColor = Cesium.Color.fromCssColorString("#0ea5e9").withAlpha(0.2);
