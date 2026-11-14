@@ -152,11 +152,11 @@ function createSyntheticTle(noradId: number, incDeg: number, altKm: number, ecc 
   return { tle1, tle2 };
 }
 
-async function fetchCelestrakGroup(group: string): Promise<CelestrakGpItem[]> {
+async function fetchCelestrakGroup(group: string, timeoutMs = 45000): Promise<CelestrakGpItem[]> {
   try {
     const url = `${CELESTRAK_API_BASE}?GROUP=${group}&FORMAT=json`;
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 12000);
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
     const resp = await fetch(url, {
       signal: controller.signal,
       headers: { "User-Agent": "OrbitalIntelligencePlatform/1.0", "Accept": "application/json" },
@@ -175,10 +175,7 @@ export async function fetchSatellites(): Promise<ParsedSatelliteData[]> {
   const allSatellites: ParsedSatelliteData[] = [];
   const seenNoradIds = new Set<number>();
 
-  // Fetch active satellites from CelesTrak
-  const items = await fetchCelestrakGroup("active");
-
-  if (items.length > 0) {
+  const processItems = (items: CelestrakGpItem[]) => {
     for (const item of items) {
       if (!item.NORAD_CAT_ID || seenNoradIds.has(item.NORAD_CAT_ID)) continue;
       seenNoradIds.add(item.NORAD_CAT_ID);
@@ -208,7 +205,23 @@ export async function fetchSatellites(): Promise<ParsedSatelliteData[]> {
         ...params,
       });
     }
+  };
+
+  // 1. Fetch space stations and visual satellites first (fast, reliable, high priority)
+  try {
+    const [stations, visual] = await Promise.all([
+      fetchCelestrakGroup("stations", 15000),
+      fetchCelestrakGroup("visual", 15000),
+    ]);
+    processItems(stations);
+    processItems(visual);
+  } catch (e) {
+    logger.warn({ e }, "High-priority CelesTrak prefetch encountered an error");
   }
+
+  // 2. Fetch full active satellite group (up to 45s timeout for large JSON stream)
+  const activeItems = await fetchCelestrakGroup("active", 45000);
+  processItems(activeItems);
 
   // Fallback if CelesTrak returns 0 items
   if (allSatellites.length === 0) {
@@ -251,7 +264,7 @@ export async function fetchDebris(): Promise<ParsedDebrisData[]> {
   const debrisGroups = ["1999-025", "iridium-33-debris", "cosmos-2251-debris", "analyst", "last-30-days"];
   
   for (const group of debrisGroups) {
-    const items = await fetchCelestrakGroup(group);
+    const items = await fetchCelestrakGroup(group, 20000);
     for (const item of items) {
       if (!item.NORAD_CAT_ID || seenNoradIds.has(item.NORAD_CAT_ID)) continue;
       seenNoradIds.add(item.NORAD_CAT_ID);
@@ -326,4 +339,3 @@ export async function fetchDebris(): Promise<ParsedDebrisData[]> {
   logger.info({ totalDebris: debrisList.length }, "Debris & Rocket body catalog loaded");
   return debrisList;
 }
-

@@ -12,9 +12,8 @@ if (rawPort && (Number.isNaN(port) || port <= 0)) {
 }
 
 const basePath = process.env.BASE_PATH ?? "/";
+const apiTarget = process.env.VITE_API_URL || process.env.VITE_API_BASE_URL || "http://localhost:10000";
 
-// Only import Replit-specific plugins outside of production builds
-// (REPL_ID is never set in Cloudflare CI, so these are safely skipped there)
 const replitPlugins =
   process.env.NODE_ENV !== "production" &&
   process.env.REPL_ID !== undefined
@@ -46,7 +45,6 @@ export default defineConfig({
     format: "es",
   },
   build: {
-    // esnext required for modern async/await and ES modules on Cloudflare Pages
     target: "esnext",
     outDir: path.resolve(import.meta.dirname, "dist"),
     emptyOutDir: true,
@@ -56,6 +54,13 @@ export default defineConfig({
     strictPort: true,
     host: "0.0.0.0",
     allowedHosts: true,
+    proxy: {
+      "/api": {
+        target: apiTarget,
+        changeOrigin: true,
+        secure: false,
+      },
+    },
     fs: {
       strict: true,
     },
@@ -64,5 +69,12 @@ export default defineConfig({
     port,
     host: "0.0.0.0",
     allowedHosts: true,
+    proxy: {
+      "/api": {
+        target: apiTarget,
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
 });

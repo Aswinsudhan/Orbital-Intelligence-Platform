@@ -17,11 +17,11 @@ const DEFAULT_JSON_ACCEPT = "application/json, application/problem+json";
 
 const getInitialBaseUrl = (): string | null => {
   const metaEnv = (import.meta as any)?.env;
-  if (metaEnv && metaEnv.VITE_API_URL) {
-    return (metaEnv.VITE_API_URL as string).replace(/\/+$/, "");
+  if (metaEnv && (metaEnv.VITE_API_URL || metaEnv.VITE_API_BASE_URL)) {
+    return ((metaEnv.VITE_API_URL || metaEnv.VITE_API_BASE_URL) as string).replace(/\/+$/, "");
   }
-  if (typeof window !== "undefined" && (window as any).VITE_API_URL) {
-    return (window as any).VITE_API_URL.replace(/\/+$/, "");
+  if (typeof window !== "undefined" && ((window as any).VITE_API_URL || (window as any).VITE_API_BASE_URL)) {
+    return ((window as any).VITE_API_URL || (window as any).VITE_API_BASE_URL).replace(/\/+$/, "");
   }
   return null;
 };
