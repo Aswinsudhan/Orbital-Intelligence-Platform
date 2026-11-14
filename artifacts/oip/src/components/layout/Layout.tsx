@@ -1,12 +1,16 @@
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { TopNav } from "./TopNav";
+import { MobileBottomNav } from "./MobileBottomNav";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset className="flex flex-col h-[100dvh] overflow-hidden relative" style={{ background: "#070d18" }}>
+      <SidebarInset 
+        className="flex flex-col min-h-[100dvh] h-[100dvh] overflow-hidden relative w-full max-w-full" 
+        style={{ background: "#070d18" }}
+      >
         {/* Subtle space background */}
         <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
           {/* Faint star dots via CSS */}
@@ -42,9 +46,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </div>
 
         <TopNav />
-        <main className="flex-1 overflow-auto p-4 md:p-6 relative z-10">
+        
+        {/* Main Content Area - with responsive padding and mobile bottom nav clearance */}
+        <main className="flex-1 overflow-x-hidden overflow-y-auto p-3 sm:p-4 md:p-6 pb-20 md:pb-6 relative z-10 w-full max-w-full">
           {children}
         </main>
+
+        {/* Mobile Bottom Navigation Bar (md:hidden) */}
+        <MobileBottomNav />
       </SidebarInset>
     </SidebarProvider>
   );

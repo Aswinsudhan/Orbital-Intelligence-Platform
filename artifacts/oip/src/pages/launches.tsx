@@ -54,7 +54,7 @@ function Countdown({ target }: { target: string }) {
   const s = Math.floor((diff % 60000) / 1000);
 
   return (
-    <span className="font-mono text-sm text-primary tabular-nums">
+    <span className="font-mono text-xs sm:text-sm text-primary tabular-nums">
       T‑{d > 0 ? `${d}d ` : ""}{String(h).padStart(2, "0")}:{String(m).padStart(2, "0")}:{String(s).padStart(2, "0")}
     </span>
   );
@@ -69,7 +69,7 @@ function LaunchCard({ launch, upcoming }: { launch: Launch; upcoming: boolean })
   return (
     <Card className="overflow-hidden hover:border-primary/40 transition-colors">
       <div className="flex flex-col sm:flex-row">
-        <div className="sm:w-52 h-44 sm:h-auto shrink-0 overflow-hidden bg-muted relative">
+        <div className="w-full sm:w-52 h-40 sm:h-auto shrink-0 overflow-hidden bg-muted relative">
           <img
             src={imgSrc}
             alt={launch.name}
@@ -82,19 +82,19 @@ function LaunchCard({ launch, upcoming }: { launch: Launch; upcoming: boolean })
             }}
           />
         </div>
-        <CardContent className="p-4 flex-1 space-y-3">
+        <CardContent className="p-3 sm:p-4 flex-1 space-y-2.5">
           <div className="flex flex-wrap items-start justify-between gap-2">
-            <div>
-              <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-0.5">{launch.provider}</p>
-              <h3 className="font-bold text-base leading-tight">{launch.missionName}</h3>
-              <p className="text-sm text-muted-foreground">{launch.rocket}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] sm:text-xs text-muted-foreground font-medium uppercase tracking-wider mb-0.5">{launch.provider}</p>
+              <h3 className="font-bold text-sm sm:text-base leading-tight truncate">{launch.missionName}</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground">{launch.rocket}</p>
             </div>
-            <div className="flex flex-col items-end gap-1.5 shrink-0">
-              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${statusColor(launch.statusAbbrev)}`}>
+            <div className="flex flex-col items-end gap-1 shrink-0">
+              <span className={`text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full border ${statusColor(launch.statusAbbrev)}`}>
                 {launch.status}
               </span>
               {launch.orbit && (
-                <Badge variant="outline" className="text-xs">{launch.orbitAbbrev ?? launch.orbit}</Badge>
+                <Badge variant="outline" className="text-[10px]">{launch.orbitAbbrev ?? launch.orbit}</Badge>
               )}
             </div>
           </div>
@@ -105,10 +105,10 @@ function LaunchCard({ launch, upcoming }: { launch: Launch; upcoming: boolean })
             </p>
           )}
 
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+          <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] sm:text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <MapPin className="w-3 h-3 shrink-0" />
-              {launch.location}
+              <span className="truncate max-w-[200px]">{launch.location}</span>
             </span>
             <span className="flex items-center gap-1">
               <Globe className="w-3 h-3 shrink-0" />
@@ -122,8 +122,8 @@ function LaunchCard({ launch, upcoming }: { launch: Launch; upcoming: boolean })
             )}
           </div>
 
-          <div className="flex items-center justify-between pt-1 border-t border-border">
-            <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-border/60">
+            <span className="flex items-center gap-1.5 text-[10px] sm:text-xs text-muted-foreground">
               <Calendar className="w-3 h-3" />
               {date.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
               {" · "}
@@ -181,23 +181,23 @@ export default function Launches() {
   const { data, loading, error } = useLaunches(tab);
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="space-y-6 max-w-5xl mx-auto w-full">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Launch Tracker</h1>
-          <p className="text-muted-foreground mt-1">
-            Live data from Launch Library 2 — upcoming and recent orbital launches worldwide
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Launch Manifest</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+            Real-time orbital launch schedules from Launch Library 2
           </p>
         </div>
 
-        <div className="flex rounded-lg border border-border overflow-hidden shrink-0">
+        <div className="flex rounded-xl border border-border overflow-hidden shrink-0 self-start sm:self-auto bg-card">
           {(["upcoming", "recent"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`px-4 py-2 text-sm font-medium transition-colors capitalize ${
+              className={`px-4 py-2 text-xs sm:text-sm font-medium transition-colors capitalize min-h-[44px] ${
                 tab === t
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-primary text-primary-foreground font-semibold"
                   : "bg-card text-muted-foreground hover:text-foreground hover:bg-muted"
               }`}
             >
@@ -208,10 +208,10 @@ export default function Launches() {
       </div>
 
       {data && !loading && (
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-muted-foreground font-mono">
           {tab === "upcoming"
-            ? `${data.total} upcoming launches in manifest`
-            : `${data.total.toLocaleString()} launches in history`}
+            ? `${data.total} upcoming launches scheduled`
+            : `${data.total.toLocaleString()} completed launches logged`}
         </p>
       )}
 
@@ -224,7 +224,7 @@ export default function Launches() {
       )}
 
       {error && (
-        <div className="p-6 rounded-xl border border-destructive/40 bg-destructive/10 text-destructive text-sm">
+        <div className="p-4 sm:p-6 rounded-xl border border-destructive/40 bg-destructive/10 text-destructive text-xs sm:text-sm font-mono">
           Failed to load launch data: {error}
         </div>
       )}

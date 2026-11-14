@@ -3,8 +3,8 @@ import { useGetOrbitalForecast, getGetOrbitalForecastQueryKey, GetOrbitalForecas
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ComposedChart, Line } from "recharts";
-import { TrendingUp, AlertCircle } from "lucide-react";
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ComposedChart, Area, Line } from "recharts";
+import { TrendingUp } from "lucide-react";
 
 export default function Forecast() {
   const [horizon, setHorizon] = useState<GetOrbitalForecastHorizon>("90d");
@@ -15,60 +15,74 @@ export default function Forecast() {
   );
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="space-y-6 w-full max-w-full">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Congestion Forecast</h1>
-          <p className="text-muted-foreground mt-1">Predictive modeling of orbital object density</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Congestion Forecast</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">Predictive modeling of orbital object density over future horizons</p>
         </div>
         
-        <ToggleGroup type="single" value={horizon} onValueChange={(v) => v && setHorizon(v as GetOrbitalForecastHorizon)}>
-          <ToggleGroupItem value="30d">30 Days</ToggleGroupItem>
-          <ToggleGroupItem value="90d">90 Days</ToggleGroupItem>
-          <ToggleGroupItem value="1y">1 Year</ToggleGroupItem>
+        <ToggleGroup 
+          type="single" 
+          value={horizon} 
+          onValueChange={(v) => v && setHorizon(v as GetOrbitalForecastHorizon)}
+          className="bg-card border border-border p-1 rounded-xl self-start sm:self-auto"
+        >
+          <ToggleGroupItem value="30d" className="min-h-[40px] px-3 text-xs">30 Days</ToggleGroupItem>
+          <ToggleGroupItem value="90d" className="min-h-[40px] px-3 text-xs">90 Days</ToggleGroupItem>
+          <ToggleGroupItem value="1y" className="min-h-[40px] px-3 text-xs">1 Year</ToggleGroupItem>
         </ToggleGroup>
       </div>
 
       {isLoading ? (
-        <Skeleton className="h-[500px] w-full rounded-xl" />
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <Skeleton className="h-24 rounded-xl" />
+            <Skeleton className="h-24 rounded-xl" />
+            <Skeleton className="h-24 rounded-xl" />
+          </div>
+          <Skeleton className="h-[400px] w-full rounded-xl" />
+        </div>
       ) : !data ? (
-        <div className="text-muted-foreground">No forecast data available.</div>
+        <div className="text-center py-12 text-muted-foreground font-mono">
+          No forecast data available.
+        </div>
       ) : (
         <div className="grid gap-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             <Card>
-              <CardContent className="pt-6">
-                <div className="text-sm font-medium text-muted-foreground mb-2">Predicted Trend</div>
+              <CardContent className="pt-5 pb-5">
+                <div className="text-xs font-medium text-muted-foreground mb-1 uppercase tracking-wider">Predicted Trend</div>
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-primary" />
-                  <span className="text-2xl font-bold uppercase">{data.trend}</span>
+                  <span className="text-xl sm:text-2xl font-bold uppercase">{data.trend}</span>
                 </div>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="pt-6">
-                <div className="text-sm font-medium text-muted-foreground mb-2">Model Confidence</div>
-                <div className="text-2xl font-bold font-mono">{(data.confidence * 100).toFixed(1)}%</div>
+              <CardContent className="pt-5 pb-5">
+                <div className="text-xs font-medium text-muted-foreground mb-1 uppercase tracking-wider">Model Confidence</div>
+                <div className="text-xl sm:text-2xl font-bold font-mono text-cyan-400">{(data.confidence * 100).toFixed(1)}%</div>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="pt-6">
-                <div className="text-sm font-medium text-muted-foreground mb-2">Forecast Horizon</div>
-                <div className="text-2xl font-bold uppercase">{data.horizon}</div>
+              <CardContent className="pt-5 pb-5">
+                <div className="text-xs font-medium text-muted-foreground mb-1 uppercase tracking-wider">Forecast Horizon</div>
+                <div className="text-xl sm:text-2xl font-bold uppercase">{data.horizon}</div>
               </CardContent>
             </Card>
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Projected Object Count</CardTitle>
-              <CardDescription>Predicted total objects with confidence intervals</CardDescription>
+          <Card className="min-w-0 overflow-hidden">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base sm:text-lg">Projected Object Count</CardTitle>
+              <CardDescription className="text-xs">Predicted total objects with statistical confidence intervals</CardDescription>
             </CardHeader>
-            <CardContent className="h-[500px]">
+            <CardContent className="h-[340px] sm:h-[450px] p-2 min-w-0">
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart
                   data={data.dataPoints}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
+                  margin={{ top: 15, right: 15, left: 0, bottom: 5 }}
                 >
                   <defs>
                     <linearGradient id="confidenceBand" x1="0" y1="0" x2="0" y2="1">
@@ -80,50 +94,41 @@ export default function Forecast() {
                   <XAxis 
                     dataKey="date" 
                     tickFormatter={(val) => new Date(val).toLocaleDateString(undefined, {month:'short', day:'numeric'})}
-                    tick={{fill: 'hsl(var(--muted-foreground))'}} tickLine={false} axisLine={false} 
+                    tick={{fill: 'hsl(var(--muted-foreground))', fontSize: 11}} tickLine={false} axisLine={false} 
                   />
                   <YAxis 
                     domain={['auto', 'auto']}
-                    tick={{fill: 'hsl(var(--muted-foreground))', fontFamily: 'var(--font-mono)'}} 
+                    width={55}
+                    tick={{fill: 'hsl(var(--muted-foreground))', fontSize: 10}} 
                     tickLine={false} axisLine={false} 
                   />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))' }}
+                    contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px', fontSize: '12px' }}
                     labelFormatter={(val) => new Date(val).toLocaleDateString()}
-                    formatter={(value: number, name: string) => [
-                      <span className="font-mono">{value.toLocaleString()}</span>, 
+                    formatter={(value: any, name: string) => [
+                      <span key="val" className="font-mono">{Number(value).toLocaleString()}</span>, 
                       name === 'predicted' ? 'Predicted' : name === 'upper' ? 'Upper Bound' : 'Lower Bound'
                     ]}
                   />
-                  {/* The area represents the confidence band. We map 'lower' and 'upper' using an array dataKey */}
                   <Area 
                     type="monotone" 
-                    dataKey={(data) => [data.lower, data.upper]} 
+                    dataKey="upper" 
                     stroke="none" 
                     fill="url(#confidenceBand)" 
-                    name="Confidence Interval"
+                    name="upper"
                   />
                   <Line 
                     type="monotone" 
                     dataKey="predicted" 
                     stroke="hsl(var(--primary))" 
-                    strokeWidth={3} 
-                    dot={false} 
-                    name="Predicted"
-                    activeDot={{ r: 6, fill: 'hsl(var(--primary))', stroke: 'hsl(var(--background))', strokeWidth: 2 }}
+                    strokeWidth={2}
+                    dot={false}
+                    name="predicted"
                   />
                 </ComposedChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
-          
-          <div className="flex items-start gap-3 p-4 bg-muted/50 rounded-lg border border-border text-sm text-muted-foreground">
-            <AlertCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-            <p>
-              Forecast models use historical CelesTrak data and known launch manifests to predict orbital congestion. 
-              The confidence interval widens further into the future due to unpredicted fragmentation events and undisclosed launches.
-            </p>
-          </div>
         </div>
       )}
     </div>

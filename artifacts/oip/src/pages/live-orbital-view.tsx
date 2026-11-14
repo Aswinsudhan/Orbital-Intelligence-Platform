@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import * as satellite from "satellite.js";
 import { customFetch } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,12 @@ import {
   Compass,
   Layers,
   X,
-  Maximize2
+  Maximize2,
+  Minimize2,
+  Zap,
+  SlidersHorizontal,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 
 interface TrackedObject {
@@ -49,6 +54,7 @@ interface CalculatedPosition {
 
 export default function LiveOrbitalView() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const outerWrapperRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<any>(null);
   const pointsCollectionRef = useRef<any>(null);
   const pointPrimitiveMapRef = useRef<Map<number, any>>(new Map());
@@ -69,6 +75,13 @@ export default function LiveOrbitalView() {
 
   const [lastDataUpdate, setLastDataUpdate] = useState<string>("");
   const [calculationTime, setCalculationTime] = useState<string>("");
+
+  // Mobile-specific UI toggles
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [ecoMode, setEcoMode] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [mobileStatsExpanded, setMobileStatsExpanded] = useState(false);
 
   // Statistics
   const stats = useMemo(() => {
@@ -222,9 +235,9 @@ export default function LiveOrbitalView() {
     }
 
     const Cesium = window.Cesium;
-
-    // Suppress Ion token warning for local rendering
     Cesium.Ion.defaultAccessToken = "";
+
+    const isMobileDevice = window.innerWidth < 768;
 
     const viewer = new Cesium.Viewer(containerRef.current, {
       animation: false,
@@ -239,12 +252,11 @@ export default function LiveOrbitalView() {
       timeline: false,
       navigationHelpButton: false,
       navigationInstructionsInitiallyVisible: false,
-      shadows: true,
+      shadows: !isMobileDevice,
       shouldAnimate: true,
       globe: new Cesium.Globe(Cesium.Ellipsoid.WGS84),
     });
 
-    // Styling Cesium environment for aerospace look
     const scene = viewer.scene;
     scene.imageryLayers.addImageryProvider(
       new Cesium.UrlTemplateImageryProvider({
@@ -254,14 +266,17 @@ export default function LiveOrbitalView() {
       }),
     );
     scene.skyAtmosphere.show = true;
-    scene.globe.enableLighting = true;
-    scene.globe.maximumScreenSpaceError = 1.25;
+    scene.globe.enableLighting = !isMobileDevice;
+    scene.globe.maximumScreenSpaceError = isMobileDevice ? 2.5 : 1.25;
     scene.globe.showGroundAtmosphere = true;
-    scene.postProcessStages.fxaa.enabled = true;
+    scene.postProcessStages.fxaa.enabled = !isMobileDevice;
     scene.globe.atmosphereColor = Cesium.Color.fromCssColorString("#0ea5e9").withAlpha(0.2);
     scene.globe.atmosphereRayleighCoefficient = new Cesium.Cartesian3(5.5e-6, 13.0e-6, 28.4e-6);
 
-    // Initial camera positioning over Central Atlantic / Global view
+    // Optimize resolution scale for mobile screens to avoid GPU overheating
+    viewer.resolutionScale = Math.min(window.devicePixelRatio || 1, isMobileDevice ? 1.25 : 1.5);
+
+    // Initial camera positioning
     viewer.camera.setView({
       destination: Cesium.Cartesian3.fromDegrees(0, 20, 25000000),
     });
@@ -270,7 +285,7 @@ export default function LiveOrbitalView() {
     const pointsCollection = scene.primitives.add(new Cesium.PointPrimitiveCollection());
     pointsCollectionRef.current = pointsCollection;
 
-    // Set up click handler for picking objects
+    // Set up click / touch handler for picking objects
     const handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
     handler.setInputAction((click: any) => {
       const picked = scene.pick(click.position);
@@ -291,6 +306,43 @@ export default function LiveOrbitalView() {
     };
   }, [cesiumReady]);
 
+  // Handle Resize and Orientation Change for smooth mobile responsiveness
+  useEffect(() => {
+    const handleResize = () => {
+      if (viewerRef.current && !viewerRef.current.isDestroyed()) {
+        viewerRef.current.resize();
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("orientationchange", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("orientationchange", handleResize);
+    };
+  }, []);
+
+  // Update Cesium settings when Eco Mode changes
+  useEffect(() => {
+    if (!viewerRef.current || !viewerRef.current.scene) return;
+    const scene = viewerRef.current.scene;
+    const isMobile = window.innerWidth < 768;
+
+    if (ecoMode) {
+      viewerRef.current.resolutionScale = 1.0;
+      scene.globe.maximumScreenSpaceError = 3.5;
+      scene.globe.enableLighting = false;
+      scene.postProcessStages.fxaa.enabled = false;
+    } else {
+      viewerRef.current.resolutionScale = Math.min(window.devicePixelRatio || 1, isMobile ? 1.25 : 1.5);
+      scene.globe.maximumScreenSpaceError = isMobile ? 2.5 : 1.25;
+      scene.globe.enableLighting = !isMobile;
+      scene.postProcessStages.fxaa.enabled = !isMobile;
+    }
+    scene.requestRender();
+  }, [ecoMode]);
+
   // 4. Render and update object points in Cesium scene
   useEffect(() => {
     const viewer = viewerRef.current;
@@ -309,15 +361,25 @@ export default function LiveOrbitalView() {
     const now = new Date();
     const gmst = satellite.gstime(now);
 
+    // In Eco Mode, limit maximum debris rendered to preserve mobile battery
+    let renderedDebrisCount = 0;
+    const maxDebrisInEco = 400;
+
     objects.forEach((obj) => {
       if (!obj.satrec) return;
 
-      // Filter checks
       if (categoryFilter !== "ALL" && obj.objectType !== categoryFilter.replace("_", " ")) {
         return;
       }
       if (orbitFilter !== "ALL" && obj.orbitType !== orbitFilter) {
         return;
+      }
+
+      if (ecoMode && obj.objectType === "DEBRIS") {
+        if (renderedDebrisCount >= maxDebrisInEco && selectedObject?.noradId !== obj.noradId) {
+          return;
+        }
+        renderedDebrisCount++;
       }
 
       try {
@@ -332,7 +394,6 @@ export default function LiveOrbitalView() {
         if (isNaN(lonDeg) || isNaN(latDeg) || isNaN(heightMeters)) return;
 
         const cartesian = Cesium.Cartesian3.fromDegrees(lonDeg, latDeg, heightMeters);
-
         const isSelected = selectedObject?.noradId === obj.noradId;
 
         let color = activeColor;
@@ -355,7 +416,7 @@ export default function LiveOrbitalView() {
     });
 
     viewer.scene.requestRender();
-  }, [objects, categoryFilter, orbitFilter, selectedObject]);
+  }, [objects, categoryFilter, orbitFilter, selectedObject, ecoMode]);
 
   // 5. Real-time SGP4 position propagation loop (1-second clock tick)
   useEffect(() => {
@@ -418,7 +479,6 @@ export default function LiveOrbitalView() {
 
     const Cesium = window.Cesium;
 
-    // Remove existing path entity
     if (pathEntityRef.current) {
       viewer.entities.remove(pathEntityRef.current);
       pathEntityRef.current = null;
@@ -429,7 +489,6 @@ export default function LiveOrbitalView() {
     const satrec = selectedObject.satrec;
     const now = new Date();
 
-    // Determine orbit period
     const meanMotionRad = satrec.no; // rad/min
     const periodMinutes = meanMotionRad > 0 ? (2 * Math.PI) / meanMotionRad : 95;
     const totalSteps = 100;
@@ -481,15 +540,16 @@ export default function LiveOrbitalView() {
     const q = searchQuery.toLowerCase();
     const matches = objects.filter(
       (o) => o.name.toLowerCase().includes(q) || String(o.noradId).includes(q)
-    ).slice(0, 8);
+    ).slice(0, 10);
     setSearchResults(matches);
   }, [searchQuery, objects]);
 
   // 8. Fly camera to selected satellite
-  const handleSelectObject = (obj: TrackedObject) => {
+  const handleSelectObject = useCallback((obj: TrackedObject) => {
     setSelectedObject(obj);
     setSearchQuery("");
     setSearchResults([]);
+    setMobileSearchOpen(false);
 
     const viewer = viewerRef.current;
     if (!viewer || !obj.satrec || typeof window === "undefined" || !window.Cesium) return;
@@ -510,9 +570,9 @@ export default function LiveOrbitalView() {
         duration: 1.8,
       });
     }
-  };
+  }, []);
 
-  const resetCamera = () => {
+  const resetCamera = useCallback(() => {
     if (viewerRef.current && typeof window !== "undefined" && window.Cesium) {
       const Cesium = window.Cesium;
       viewerRef.current.camera.flyTo({
@@ -520,99 +580,165 @@ export default function LiveOrbitalView() {
         duration: 1.5,
       });
     }
+  }, []);
+
+  // Fullscreen toggle handler
+  const toggleFullscreen = () => {
+    if (!outerWrapperRef.current) return;
+
+    if (!document.fullscreenElement) {
+      outerWrapperRef.current.requestFullscreen?.().then(() => {
+        setIsFullscreen(true);
+      }).catch(() => {
+        setIsFullscreen((prev) => !prev);
+      });
+    } else {
+      document.exitFullscreen?.().then(() => {
+        setIsFullscreen(false);
+      }).catch(() => {
+        setIsFullscreen(false);
+      });
+    }
   };
 
-  return (
-    <div className="relative w-full h-[calc(100vh-4rem)] bg-slate-950 text-slate-100 overflow-hidden font-sans select-none">
-      
-      {/* 3D Cesium Container */}
-      <div ref={containerRef} className="absolute inset-0 w-full h-full" />
+  useEffect(() => {
+    const handleFsChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+      if (viewerRef.current && !viewerRef.current.isDestroyed()) {
+        setTimeout(() => viewerRef.current.resize(), 100);
+      }
+    };
+    document.addEventListener("fullscreenchange", handleFsChange);
+    return () => document.removeEventListener("fullscreenchange", handleFsChange);
+  }, []);
 
-      {/* Top HUD Banner — Title & KPI Stats */}
-      <div className="absolute top-4 left-4 right-4 z-20 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 pointer-events-none">
+  return (
+    <div 
+      ref={outerWrapperRef}
+      className={`relative w-full bg-slate-950 text-slate-100 overflow-hidden font-sans select-none transition-all ${
+        isFullscreen 
+          ? "fixed inset-0 z-50 h-[100dvh]" 
+          : "h-[calc(100dvh-7.5rem)] sm:h-[calc(100dvh-5.5rem)] md:h-[calc(100vh-4rem)] rounded-xl border border-slate-800"
+      }`}
+    >
+      
+      {/* 3D Cesium Container with touch gesture support */}
+      <div 
+        ref={containerRef} 
+        className="absolute inset-0 w-full h-full touch-none" 
+      />
+
+      {/* ======================================================== */}
+      {/* TOP HUD: Responsive for Desktop & Mobile                */}
+      {/* ======================================================== */}
+      <div className="absolute top-2 sm:top-4 left-2 sm:left-4 right-2 sm:right-4 z-20 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 pointer-events-none">
         
-        {/* Title Badge */}
-        <div className="pointer-events-auto bg-slate-900/85 backdrop-blur-md border border-slate-800 rounded-xl p-3 px-5 shadow-2xl flex items-center gap-3">
-          <div className="relative flex items-center justify-center">
-            <GlobeIcon className="w-6 h-6 text-cyan-400 animate-pulse" />
-            <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500"></span>
-            </span>
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-lg font-bold tracking-wider text-slate-100 uppercase">Live Orbital View</h1>
-              <Badge variant="outline" className="text-[10px] font-mono border-cyan-500/50 text-cyan-400 bg-cyan-950/40">
-                SGP4 REAL-TIME
-              </Badge>
+        {/* Title Banner */}
+        <div className="pointer-events-auto bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-xl p-2.5 sm:p-3 px-3 sm:px-4 shadow-xl flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="relative flex items-center justify-center shrink-0">
+              <GlobeIcon className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 animate-pulse" />
+              <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+              </span>
             </div>
-            <p className="text-xs text-slate-400 font-mono">
-              Space Situational Awareness • CelesTrak Integration
-            </p>
+            <div>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <h1 className="text-sm sm:text-base font-bold tracking-wider text-slate-100 uppercase">Live Orbital View</h1>
+                <Badge variant="outline" className="text-[9px] font-mono border-cyan-500/50 text-cyan-400 bg-cyan-950/40 px-1 py-0">
+                  SGP4
+                </Badge>
+              </div>
+              <p className="text-[10px] sm:text-xs text-slate-400 font-mono hidden xs:block">
+                CelesTrak • Real-Time Propagation
+              </p>
+            </div>
           </div>
+
+          {/* Mobile Stats Toggle Button */}
+          <button
+            type="button"
+            onClick={() => setMobileStatsExpanded(!mobileStatsExpanded)}
+            className="md:hidden flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-800/80 border border-slate-700 text-xs font-mono text-cyan-300 min-h-[36px]"
+          >
+            <span>{loading ? "..." : stats.total}</span>
+            {mobileStatsExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </button>
         </div>
 
-        {/* Live Counters */}
-        <div className="pointer-events-auto bg-slate-900/85 backdrop-blur-md border border-slate-800 rounded-xl p-2 px-4 shadow-2xl flex items-center divide-x divide-slate-800 text-xs font-mono">
-          <div className="px-3 text-center">
-            <span className="text-slate-400 block text-[10px] uppercase">Tracked Objects</span>
-            <span className="text-base font-bold text-slate-100">{loading ? <Skeleton className="h-5 w-10 mx-auto" /> : stats.total.toLocaleString()}</span>
-          </div>
-          <div className="px-3 text-center">
-            <span className="text-cyan-400 flex items-center justify-center gap-1 text-[10px] uppercase">
-              <SatelliteIcon className="w-3 h-3" /> Active
+        {/* Live Counters (Always visible on Desktop, collapsible on Mobile) */}
+        <div className={`pointer-events-auto bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-xl p-2 px-3 shadow-xl ${
+          mobileStatsExpanded ? "flex" : "hidden md:flex"
+        } items-center justify-around divide-x divide-slate-800 text-xs font-mono animate-in fade-in duration-200`}>
+          <div className="px-2 sm:px-3 text-center">
+            <span className="text-slate-400 block text-[9px] uppercase">Tracked</span>
+            <span className="text-sm sm:text-base font-bold text-slate-100">
+              {loading ? <Skeleton className="h-4 w-8 mx-auto" /> : stats.total.toLocaleString()}
             </span>
-            <span className="text-base font-bold text-cyan-400">{loading ? <Skeleton className="h-5 w-10 mx-auto" /> : stats.active.toLocaleString()}</span>
           </div>
-          <div className="px-3 text-center">
-            <span className="text-orange-400 flex items-center justify-center gap-1 text-[10px] uppercase">
-              <Trash2 className="w-3 h-3" /> Debris
+          <div className="px-2 sm:px-3 text-center">
+            <span className="text-cyan-400 flex items-center justify-center gap-1 text-[9px] uppercase">
+              <SatelliteIcon className="w-2.5 h-2.5" /> Active
             </span>
-            <span className="text-base font-bold text-orange-400">{loading ? <Skeleton className="h-5 w-10 mx-auto" /> : stats.debris.toLocaleString()}</span>
+            <span className="text-sm sm:text-base font-bold text-cyan-400">
+              {loading ? <Skeleton className="h-4 w-8 mx-auto" /> : stats.active.toLocaleString()}
+            </span>
           </div>
-          <div className="px-3 text-center">
-            <span className="text-pink-400 flex items-center justify-center gap-1 text-[10px] uppercase">
-              <Flame className="w-3 h-3" /> Rocket Bodies
+          <div className="px-2 sm:px-3 text-center">
+            <span className="text-orange-400 flex items-center justify-center gap-1 text-[9px] uppercase">
+              <Trash2 className="w-2.5 h-2.5" /> Debris
             </span>
-            <span className="text-base font-bold text-pink-400">{loading ? <Skeleton className="h-5 w-10 mx-auto" /> : stats.rocket.toLocaleString()}</span>
+            <span className="text-sm sm:text-base font-bold text-orange-400">
+              {loading ? <Skeleton className="h-4 w-8 mx-auto" /> : stats.debris.toLocaleString()}
+            </span>
+          </div>
+          <div className="px-2 sm:px-3 text-center">
+            <span className="text-pink-400 flex items-center justify-center gap-1 text-[9px] uppercase">
+              <Flame className="w-2.5 h-2.5" /> Rockets
+            </span>
+            <span className="text-sm sm:text-base font-bold text-pink-400">
+              {loading ? <Skeleton className="h-4 w-8 mx-auto" /> : stats.rocket.toLocaleString()}
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Sub-Header: Source Timestamps Bar */}
-      <div className="absolute top-20 left-4 z-20 pointer-events-none hidden sm:flex flex-col gap-1 text-[11px] font-mono text-slate-400">
-        <div className="pointer-events-auto bg-slate-900/80 backdrop-blur-md border border-slate-800/80 rounded-lg px-3 py-1.5 flex items-center gap-4">
+      {/* Sub-Header: Source Timestamps Bar (Hidden on Mobile) */}
+      <div className="absolute top-20 left-4 z-20 pointer-events-none hidden lg:flex flex-col gap-1 text-[11px] font-mono text-slate-400">
+        <div className="pointer-events-auto bg-slate-900/80 backdrop-blur-md border border-slate-800/80 rounded-lg px-3 py-1.5 flex items-center gap-3">
           <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
             <span className="h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span>
             Data Source: CelesTrak GP
           </span>
           <span className="text-slate-500">|</span>
           <span className="flex items-center gap-1">
-            <Clock className="w-3 h-3 text-slate-400" /> TLE Epoch: {lastDataUpdate || "Updating..."}
+            <Clock className="w-3 h-3 text-slate-400" /> TLE: {lastDataUpdate ? lastDataUpdate.split(" ").slice(1, 5).join(" ") : "Updating..."}
           </span>
           <span className="text-slate-500">|</span>
           <span className="flex items-center gap-1 text-cyan-300">
-            <Activity className="w-3 h-3 text-cyan-400" /> Clock: {calculationTime || "Live..."}
+            <Activity className="w-3 h-3 text-cyan-400" /> {calculationTime ? calculationTime.split(" ").slice(4, 5).join(" ") : "Live..."}
           </span>
         </div>
       </div>
 
       {/* Error / Warning Banner */}
       {errorBanner && (
-        <div className="absolute top-32 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-auto z-30 bg-amber-950/90 border border-amber-500/50 text-amber-200 px-4 py-2 rounded-lg text-xs font-mono flex items-center justify-between gap-3 shadow-xl backdrop-blur-md">
+        <div className="absolute top-24 left-2 right-2 sm:left-4 sm:right-4 md:left-1/2 md:-translate-x-1/2 md:w-auto z-30 bg-amber-950/90 border border-amber-500/50 text-amber-200 px-3 py-2 rounded-lg text-xs font-mono flex items-center justify-between gap-3 shadow-xl backdrop-blur-md">
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-            <span>{errorBanner}</span>
+            <span className="line-clamp-2">{errorBanner}</span>
           </div>
-          <button onClick={() => setErrorBanner(null)} className="text-amber-400 hover:text-amber-100">
-            <X className="w-3.5 h-3.5" />
+          <button onClick={() => setErrorBanner(null)} className="text-amber-400 hover:text-amber-100 min-h-[36px] min-w-[36px] flex items-center justify-center">
+            <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
-      {/* Floating Control Box: Search & Filters */}
-      <div className="absolute top-24 right-4 z-20 w-80 max-w-[calc(100vw-2rem)] flex flex-col gap-3 pointer-events-auto">
+      {/* ======================================================== */}
+      {/* DESKTOP FLOATING CONTROLS: Search & Filters (md:flex)   */}
+      {/* ======================================================== */}
+      <div className="absolute top-20 right-4 z-20 w-80 max-w-[calc(100vw-2rem)] hidden md:flex flex-col gap-3 pointer-events-auto">
         
         {/* Satellite Search Input */}
         <div className="relative">
@@ -621,14 +747,14 @@ export default function LiveOrbitalView() {
             <Input
               type="text"
               placeholder="Search satellite or NORAD ID..."
-              className="pl-9 pr-8 bg-slate-900/90 backdrop-blur-md border-slate-800 text-xs font-mono text-slate-100 placeholder:text-slate-500 rounded-xl focus:border-cyan-500 focus:ring-cyan-500/20"
+              className="pl-9 pr-8 bg-slate-900/90 backdrop-blur-md border-slate-800 text-xs font-mono text-slate-100 placeholder:text-slate-500 rounded-xl focus:border-cyan-500 focus:ring-cyan-500/20 h-10"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             {searchQuery && (
               <button 
                 onClick={() => { setSearchQuery(""); setSearchResults([]); }}
-                className="absolute right-2.5 text-slate-400 hover:text-slate-200"
+                className="absolute right-2.5 text-slate-400 hover:text-slate-200 min-h-[32px] min-w-[32px] flex items-center justify-center"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -642,7 +768,7 @@ export default function LiveOrbitalView() {
                 <button
                   key={res.noradId}
                   onClick={() => handleSelectObject(res)}
-                  className="w-full px-3 py-2 text-left hover:bg-cyan-950/50 transition-colors flex items-center justify-between group"
+                  className="w-full px-3 py-2.5 text-left hover:bg-cyan-950/50 transition-colors flex items-center justify-between group min-h-[44px]"
                 >
                   <div className="flex flex-col">
                     <span className="font-semibold text-slate-100 group-hover:text-cyan-400">{res.name}</span>
@@ -664,34 +790,45 @@ export default function LiveOrbitalView() {
         <div className="bg-slate-900/85 backdrop-blur-md border border-slate-800 rounded-xl p-3 shadow-2xl flex flex-col gap-2.5 text-xs font-mono">
           <div className="flex items-center justify-between text-slate-400 text-[11px] font-semibold border-b border-slate-800/80 pb-1.5">
             <span className="flex items-center gap-1.5"><Layers className="w-3.5 h-3.5 text-cyan-400" /> CATEGORY FILTERS</span>
-            <button onClick={resetCamera} title="Reset Camera View" className="text-slate-400 hover:text-cyan-400 flex items-center gap-1 text-[10px]">
-              <RotateCcw className="w-3 h-3" /> Reset View
-            </button>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => setEcoMode(!ecoMode)} 
+                title="Toggle Performance / Eco Mode" 
+                className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] ${
+                  ecoMode ? "bg-amber-950 text-amber-300 border border-amber-600/50" : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                <Zap className="w-3 h-3" /> {ecoMode ? "ECO" : "HQ"}
+              </button>
+              <button onClick={resetCamera} title="Reset Camera View" className="text-slate-400 hover:text-cyan-400 flex items-center gap-1 text-[10px]">
+                <RotateCcw className="w-3 h-3" /> Reset
+              </button>
+            </div>
           </div>
 
           {/* Object Type Buttons */}
           <div className="grid grid-cols-2 gap-1.5">
             <button
               onClick={() => setCategoryFilter("ALL")}
-              className={`py-1 px-2 rounded-lg text-[11px] font-medium transition-all ${categoryFilter === "ALL" ? "bg-cyan-950 border border-cyan-500/60 text-cyan-300" : "bg-slate-800/50 text-slate-400 hover:bg-slate-800"}`}
+              className={`py-1.5 px-2 rounded-lg text-[11px] font-medium transition-all min-h-[36px] ${categoryFilter === "ALL" ? "bg-cyan-950 border border-cyan-500/60 text-cyan-300" : "bg-slate-800/50 text-slate-400 hover:bg-slate-800"}`}
             >
               All Objects
             </button>
             <button
               onClick={() => setCategoryFilter("ACTIVE")}
-              className={`py-1 px-2 rounded-lg text-[11px] font-medium transition-all ${categoryFilter === "ACTIVE" ? "bg-cyan-950 border border-cyan-500/60 text-cyan-300" : "bg-slate-800/50 text-slate-400 hover:bg-slate-800"}`}
+              className={`py-1.5 px-2 rounded-lg text-[11px] font-medium transition-all min-h-[36px] ${categoryFilter === "ACTIVE" ? "bg-cyan-950 border border-cyan-500/60 text-cyan-300" : "bg-slate-800/50 text-slate-400 hover:bg-slate-800"}`}
             >
               Active Only
             </button>
             <button
               onClick={() => setCategoryFilter("DEBRIS")}
-              className={`py-1 px-2 rounded-lg text-[11px] font-medium transition-all ${categoryFilter === "DEBRIS" ? "bg-orange-950 border border-orange-500/60 text-orange-300" : "bg-slate-800/50 text-slate-400 hover:bg-slate-800"}`}
+              className={`py-1.5 px-2 rounded-lg text-[11px] font-medium transition-all min-h-[36px] ${categoryFilter === "DEBRIS" ? "bg-orange-950 border border-orange-500/60 text-orange-300" : "bg-slate-800/50 text-slate-400 hover:bg-slate-800"}`}
             >
               Debris Only
             </button>
             <button
               onClick={() => setCategoryFilter("ROCKET_BODY")}
-              className={`py-1 px-2 rounded-lg text-[11px] font-medium transition-all ${categoryFilter === "ROCKET_BODY" ? "bg-pink-950 border border-pink-500/60 text-pink-300" : "bg-slate-800/50 text-slate-400 hover:bg-slate-800"}`}
+              className={`py-1.5 px-2 rounded-lg text-[11px] font-medium transition-all min-h-[36px] ${categoryFilter === "ROCKET_BODY" ? "bg-pink-950 border border-pink-500/60 text-pink-300" : "bg-slate-800/50 text-slate-400 hover:bg-slate-800"}`}
             >
               Rocket Bodies
             </button>
@@ -705,7 +842,7 @@ export default function LiveOrbitalView() {
                 <button
                   key={orb}
                   onClick={() => setOrbitFilter(orb)}
-                  className={`px-2 py-0.5 rounded text-[10px] ${orbitFilter === orb ? "bg-slate-700 text-slate-100 font-bold" : "bg-slate-800/40 text-slate-400 hover:text-slate-200"}`}
+                  className={`px-2 py-1 rounded text-[10px] min-h-[32px] ${orbitFilter === orb ? "bg-slate-700 text-slate-100 font-bold" : "bg-slate-800/40 text-slate-400 hover:text-slate-200"}`}
                 >
                   {orb}
                 </button>
@@ -713,87 +850,282 @@ export default function LiveOrbitalView() {
             </div>
           </div>
         </div>
+
+        {/* Dedicated Fullscreen Toggle Button */}
+        <button
+          onClick={toggleFullscreen}
+          className="bg-slate-900/80 hover:bg-slate-800 border border-slate-800 rounded-xl py-2 px-3 flex items-center justify-center gap-2 text-xs font-mono text-slate-300 hover:text-cyan-400 transition-colors shadow-lg min-h-[40px]"
+        >
+          {isFullscreen ? <Minimize2 className="w-4 h-4 text-cyan-400" /> : <Maximize2 className="w-4 h-4 text-cyan-400" />}
+          <span>{isFullscreen ? "Exit Fullscreen" : "Full Screen 3D"}</span>
+        </button>
       </div>
 
-      {/* Object Information Panel Overlay */}
+      {/* ======================================================== */}
+      {/* MOBILE FLOATING ACTION TOOLBAR (md:hidden)               */}
+      {/* ======================================================== */}
+      <div className="md:hidden absolute top-16 right-2 z-20 flex flex-col gap-2 pointer-events-auto">
+        {/* Search Toggle */}
+        <button
+          type="button"
+          onClick={() => { setMobileSearchOpen(!mobileSearchOpen); setMobileFilterOpen(false); }}
+          className={`w-11 h-11 rounded-xl flex items-center justify-center shadow-lg border backdrop-blur-md transition-all ${
+            mobileSearchOpen 
+              ? "bg-cyan-500 text-white border-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.5)]" 
+              : "bg-slate-900/90 text-cyan-400 border-slate-800"
+          }`}
+          aria-label="Search satellites"
+        >
+          <Search className="w-5 h-5" />
+        </button>
+
+        {/* Filters Toggle */}
+        <button
+          type="button"
+          onClick={() => { setMobileFilterOpen(!mobileFilterOpen); setMobileSearchOpen(false); }}
+          className={`w-11 h-11 rounded-xl flex items-center justify-center shadow-lg border backdrop-blur-md transition-all ${
+            mobileFilterOpen 
+              ? "bg-cyan-500 text-white border-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.5)]" 
+              : "bg-slate-900/90 text-cyan-400 border-slate-800"
+          }`}
+          aria-label="Filter orbits"
+        >
+          <SlidersHorizontal className="w-5 h-5" />
+        </button>
+
+        {/* Eco Mode Toggle */}
+        <button
+          type="button"
+          onClick={() => setEcoMode(!ecoMode)}
+          className={`w-11 h-11 rounded-xl flex items-center justify-center shadow-lg border backdrop-blur-md transition-all ${
+            ecoMode 
+              ? "bg-amber-500/20 text-amber-300 border-amber-500/50" 
+              : "bg-slate-900/90 text-slate-400 border-slate-800"
+          }`}
+          title="Toggle Eco/Performance Mode"
+          aria-label="Toggle Eco mode"
+        >
+          <Zap className="w-5 h-5" />
+        </button>
+
+        {/* Reset View */}
+        <button
+          type="button"
+          onClick={resetCamera}
+          className="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg border border-slate-800 bg-slate-900/90 text-slate-300 backdrop-blur-md active:scale-95 transition-all"
+          title="Reset Earth View"
+          aria-label="Reset camera"
+        >
+          <RotateCcw className="w-5 h-5" />
+        </button>
+
+        {/* Fullscreen Button */}
+        <button
+          type="button"
+          onClick={toggleFullscreen}
+          className="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg border border-slate-800 bg-slate-900/90 text-slate-300 backdrop-blur-md active:scale-95 transition-all"
+          title="Toggle Fullscreen"
+          aria-label="Toggle full screen"
+        >
+          {isFullscreen ? <Minimize2 className="w-5 h-5 text-cyan-400" /> : <Maximize2 className="w-5 h-5 text-cyan-400" />}
+        </button>
+      </div>
+
+      {/* ======================================================== */}
+      {/* MOBILE SEARCH OVERLAY (md:hidden)                        */}
+      {/* ======================================================== */}
+      {mobileSearchOpen && (
+        <div className="md:hidden absolute top-16 left-2 right-16 z-30 bg-slate-900/95 backdrop-blur-xl border border-cyan-500/50 rounded-2xl p-3 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="relative flex items-center">
+            <Search className="absolute left-3 w-4 h-4 text-cyan-400" />
+            <Input
+              type="text"
+              autoFocus
+              placeholder="Search satellite or NORAD ID..."
+              className="pl-9 pr-8 bg-slate-950 border-slate-800 text-xs font-mono text-slate-100 placeholder:text-slate-500 rounded-xl h-11"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && (
+              <button 
+                onClick={() => { setSearchQuery(""); setSearchResults([]); }}
+                className="absolute right-3 text-slate-400 hover:text-slate-200 min-h-[32px] min-w-[32px] flex items-center justify-center"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          {searchResults.length > 0 && (
+            <div className="mt-2 max-h-56 overflow-y-auto divide-y divide-slate-800/60 font-mono text-xs">
+              {searchResults.map((res) => (
+                <button
+                  key={res.noradId}
+                  onClick={() => handleSelectObject(res)}
+                  className="w-full px-2 py-3 text-left hover:bg-cyan-950/40 transition-colors flex items-center justify-between min-h-[44px]"
+                >
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-slate-100 text-xs">{res.name}</span>
+                    <span className="text-[10px] text-slate-400">NORAD #{res.noradId} • {res.orbitType}</span>
+                  </div>
+                  <Badge variant="outline" className={`text-[9px] ${
+                    res.objectType === "ACTIVE" ? "border-cyan-500 text-cyan-400" :
+                    res.objectType === "DEBRIS" ? "border-orange-500 text-orange-400" : "border-pink-500 text-pink-400"
+                  }`}>
+                    {res.objectType}
+                  </Badge>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* MOBILE FILTERS OVERLAY (md:hidden)                       */}
+      {/* ======================================================== */}
+      {mobileFilterOpen && (
+        <div className="md:hidden absolute top-16 left-2 right-16 z-30 bg-slate-900/95 backdrop-blur-xl border border-cyan-500/50 rounded-2xl p-3 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200 font-mono text-xs">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+            <span className="text-[11px] font-bold text-cyan-400 uppercase flex items-center gap-1.5">
+              <Layers className="w-3.5 h-3.5" /> Filters
+            </span>
+            <button onClick={() => setMobileFilterOpen(false)} className="text-slate-400 p-1 min-h-[32px] min-w-[32px] flex items-center justify-center">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 mt-2.5">
+            <button
+              onClick={() => { setCategoryFilter("ALL"); setMobileFilterOpen(false); }}
+              className={`py-2 px-2 rounded-xl text-xs font-medium transition-all min-h-[44px] ${categoryFilter === "ALL" ? "bg-cyan-950 border border-cyan-500 text-cyan-300" : "bg-slate-800/60 text-slate-300"}`}
+            >
+              All Objects
+            </button>
+            <button
+              onClick={() => { setCategoryFilter("ACTIVE"); setMobileFilterOpen(false); }}
+              className={`py-2 px-2 rounded-xl text-xs font-medium transition-all min-h-[44px] ${categoryFilter === "ACTIVE" ? "bg-cyan-950 border border-cyan-500 text-cyan-300" : "bg-slate-800/60 text-slate-300"}`}
+            >
+              Active Satellites
+            </button>
+            <button
+              onClick={() => { setCategoryFilter("DEBRIS"); setMobileFilterOpen(false); }}
+              className={`py-2 px-2 rounded-xl text-xs font-medium transition-all min-h-[44px] ${categoryFilter === "DEBRIS" ? "bg-orange-950 border border-orange-500 text-orange-300" : "bg-slate-800/60 text-slate-300"}`}
+            >
+              Space Debris
+            </button>
+            <button
+              onClick={() => { setCategoryFilter("ROCKET_BODY"); setMobileFilterOpen(false); }}
+              className={`py-2 px-2 rounded-xl text-xs font-medium transition-all min-h-[44px] ${categoryFilter === "ROCKET_BODY" ? "bg-pink-950 border border-pink-500 text-pink-300" : "bg-slate-800/60 text-slate-300"}`}
+            >
+              Rocket Bodies
+            </button>
+          </div>
+
+          <div className="pt-2.5 mt-2 border-t border-slate-800 flex items-center justify-between">
+            <span className="text-[10px] text-slate-400 uppercase">Orbit Band:</span>
+            <div className="flex gap-1.5">
+              {(["ALL", "LEO", "MEO", "GEO"] as const).map((orb) => (
+                <button
+                  key={orb}
+                  onClick={() => { setOrbitFilter(orb); setMobileFilterOpen(false); }}
+                  className={`px-2.5 py-1.5 rounded-lg text-xs min-h-[38px] ${orbitFilter === orb ? "bg-cyan-900 border border-cyan-400 text-white font-bold" : "bg-slate-800/60 text-slate-400"}`}
+                >
+                  {orb}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* SATELLITE DETAILS DRAWER / PANEL: Mobile-Responsive      */}
+      {/* ======================================================== */}
       {selectedObject && (
-        <div className="absolute bottom-6 left-4 right-4 md:right-auto md:w-96 z-30 bg-slate-900/90 backdrop-blur-xl border border-cyan-500/40 rounded-2xl p-4 shadow-2xl font-mono text-xs animate-in fade-in slide-in-from-bottom-4 duration-200">
-          <div className="flex items-start justify-between border-b border-slate-800 pb-3 mb-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base font-bold text-slate-100 tracking-wide">{selectedObject.name}</h2>
-                <Badge variant="outline" className={`text-[10px] ${
+        <div className="absolute bottom-2 sm:bottom-4 left-2 right-2 sm:left-4 md:right-auto md:w-96 z-30 bg-slate-900/95 backdrop-blur-xl border border-cyan-500/50 rounded-2xl p-3 sm:p-4 shadow-2xl font-mono text-xs animate-in fade-in slide-in-from-bottom-4 duration-200 max-h-[60vh] overflow-y-auto">
+          
+          <div className="flex items-start justify-between border-b border-slate-800 pb-2.5 mb-2.5">
+            <div className="min-w-0 pr-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-sm sm:text-base font-bold text-slate-100 tracking-wide truncate max-w-[200px] sm:max-w-none">
+                  {selectedObject.name}
+                </h2>
+                <Badge variant="outline" className={`text-[9px] ${
                   selectedObject.objectType === "ACTIVE" ? "border-cyan-500 text-cyan-400 bg-cyan-950/40" :
                   selectedObject.objectType === "DEBRIS" ? "border-orange-500 text-orange-400 bg-orange-950/40" : "border-pink-500 text-pink-400 bg-pink-950/40"
                 }`}>
                   {selectedObject.objectType}
                 </Badge>
               </div>
-              <p className="text-[11px] text-slate-400">NORAD Catalog ID: <span className="text-cyan-400 font-semibold">{selectedObject.noradId}</span></p>
+              <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5">
+                NORAD ID: <span className="text-cyan-400 font-semibold">{selectedObject.noradId}</span>
+              </p>
             </div>
             <button 
               onClick={() => setSelectedObject(null)}
-              className="text-slate-400 hover:text-slate-100 bg-slate-800/60 p-1 rounded-lg hover:bg-slate-800 transition-colors"
+              className="text-slate-400 hover:text-slate-100 bg-slate-800/60 p-2 rounded-xl hover:bg-slate-800 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center shrink-0"
+              aria-label="Close details"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-2.5 text-[11px]">
-            <div className="bg-slate-950/60 border border-slate-800/80 p-2 rounded-xl">
-              <span className="text-slate-400 block text-[10px] uppercase">Orbit Classification</span>
+          <div className="grid grid-cols-2 gap-2 text-[10px] sm:text-[11px]">
+            <div className="bg-slate-950/70 border border-slate-800/80 p-2 rounded-xl">
+              <span className="text-slate-400 block text-[9px] uppercase">Orbit</span>
               <span className="text-slate-100 font-bold">{selectedObject.orbitType}</span>
             </div>
-            <div className="bg-slate-950/60 border border-slate-800/80 p-2 rounded-xl">
-              <span className="text-slate-400 block text-[10px] uppercase">Inclination</span>
+            <div className="bg-slate-950/70 border border-slate-800/80 p-2 rounded-xl">
+              <span className="text-slate-400 block text-[9px] uppercase">Inclination</span>
               <span className="text-slate-100 font-bold">{selectedObject.inclination != null ? `${selectedObject.inclination}°` : "—"}</span>
             </div>
 
-            <div className="bg-slate-950/60 border border-slate-800/80 p-2 rounded-xl">
-              <span className="text-slate-400 block text-[10px] uppercase">Calculated Altitude</span>
+            <div className="bg-slate-950/70 border border-slate-800/80 p-2 rounded-xl">
+              <span className="text-slate-400 block text-[9px] uppercase">Calculated Alt</span>
               <span className="text-cyan-400 font-bold">
                 {selectedPos ? `${selectedPos.alt.toLocaleString()} km` : selectedObject.altitude ? `${selectedObject.altitude.toLocaleString()} km` : "—"}
               </span>
             </div>
-            <div className="bg-slate-950/60 border border-slate-800/80 p-2 rounded-xl">
-              <span className="text-slate-400 block text-[10px] uppercase">Velocity Magnitude</span>
+            <div className="bg-slate-950/70 border border-slate-800/80 p-2 rounded-xl">
+              <span className="text-slate-400 block text-[9px] uppercase">Velocity</span>
               <span className="text-cyan-400 font-bold">
                 {selectedPos ? `${selectedPos.vel} km/s` : selectedObject.velocity ? `${selectedObject.velocity} km/s` : "7.66 km/s"}
               </span>
             </div>
 
-            <div className="col-span-2 bg-slate-950/60 border border-slate-800/80 p-2 rounded-xl flex items-center justify-between">
+            <div className="col-span-2 bg-slate-950/70 border border-slate-800/80 p-2 rounded-xl flex items-center justify-between">
               <div>
-                <span className="text-slate-400 block text-[10px] uppercase">Current Coordinates</span>
-                <span className="text-slate-200 font-semibold">
+                <span className="text-slate-400 block text-[9px] uppercase">Current Coordinates</span>
+                <span className="text-slate-200 font-semibold text-xs">
                   {selectedPos ? `${selectedPos.lat >= 0 ? `${selectedPos.lat}° N` : `${Math.abs(selectedPos.lat)}° S`}, ${selectedPos.lon >= 0 ? `${selectedPos.lon}° E` : `${Math.abs(selectedPos.lon)}° W`}` : "Propagating..."}
                 </span>
               </div>
-              <Compass className="w-5 h-5 text-cyan-400 opacity-60" />
+              <Compass className="w-5 h-5 text-cyan-400 opacity-60 shrink-0" />
             </div>
           </div>
 
-          <div className="mt-3 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400">
-            <span>TLE Epoch: {selectedObject.epoch ? new Date(selectedObject.epoch).toLocaleDateString() : "CelesTrak Recent"}</span>
-            <span className="text-emerald-400 flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400"></span> 3D Orbit Displayed
+          <div className="mt-2.5 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[9px] sm:text-[10px] text-slate-400">
+            <span>TLE Epoch: {selectedObject.epoch ? new Date(selectedObject.epoch).toLocaleDateString() : "Recent"}</span>
+            <span className="text-emerald-400 flex items-center gap-1 font-semibold">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span> 3D Orbit Displayed
             </span>
           </div>
 
           {/* Telemetry Accuracy Disclaimer */}
-          <div className="mt-2 bg-cyan-950/30 border border-cyan-800/40 rounded-lg p-2 text-[9.5px] text-cyan-200/80 flex items-start gap-1.5 leading-tight">
+          <div className="mt-2 bg-cyan-950/30 border border-cyan-800/40 rounded-lg p-2 text-[9px] text-cyan-200/80 flex items-start gap-1.5 leading-tight">
             <Info className="w-3.5 h-3.5 text-cyan-400 shrink-0 mt-0.5" />
             <span>
-              Position calculated via SGP4 orbital propagation from CelesTrak element sets. Displayed coordinates reflect analytical predictions rather than direct ground-truth telemetry.
+              Position calculated via SGP4 orbital propagation from CelesTrak element sets. Displayed coordinates reflect analytical predictions.
             </span>
           </div>
         </div>
       )}
 
-      {/* Bottom Map Legend */}
+      {/* Bottom Map Legend (Desktop only) */}
       <div className="absolute bottom-4 left-4 z-20 hidden md:flex items-center gap-4 bg-slate-900/80 backdrop-blur-md border border-slate-800 px-3 py-1.5 rounded-lg text-[11px] font-mono text-slate-400">
-        <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-cyan-400 inline-block shadow-[0_0_8px_#00f0ff]"></span> Active Satellite</span>
-        <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-orange-500 inline-block shadow-[0_0_8px_#f97316]"></span> Space Debris</span>
+        <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-cyan-400 inline-block shadow-[0_0_8px_#00f0ff]"></span> Active</span>
+        <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-orange-500 inline-block shadow-[0_0_8px_#f97316]"></span> Debris</span>
         <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-pink-500 inline-block shadow-[0_0_8px_#ec4899]"></span> Rocket Body</span>
       </div>
 

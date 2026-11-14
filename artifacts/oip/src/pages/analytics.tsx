@@ -1,7 +1,7 @@
 import { useGetCongestionData, getGetCongestionDataQueryKey, useGetOrbitDistribution, getGetOrbitDistributionQueryKey } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, Legend } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 
 const ORBIT_COLORS: Record<string, string> = {
   "LEO":            "#00d4ff",   // cyan
@@ -21,44 +21,53 @@ export default function Analytics() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <h1 className="text-3xl font-bold tracking-tight">Orbital Analytics</h1>
-        <div className="grid gap-6 md:grid-cols-2">
-          <Skeleton className="h-[400px] w-full rounded-xl" />
-          <Skeleton className="h-[400px] w-full rounded-xl" />
-          <Skeleton className="h-[400px] w-full rounded-xl md:col-span-2" />
+      <div className="space-y-6 w-full max-w-full">
+        <div>
+          <Skeleton className="h-9 w-48 mb-2" />
+          <Skeleton className="h-5 w-64" />
+        </div>
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+          <Skeleton className="h-[380px] w-full rounded-xl" />
+          <Skeleton className="h-[380px] w-full rounded-xl" />
         </div>
       </div>
     );
   }
 
   if (!congestion || !distribution) {
-    return <div className="text-muted-foreground">No data available.</div>;
+    return (
+      <div className="text-center py-12 text-muted-foreground font-mono">
+        No analytics data available.
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold tracking-tight">Orbital Analytics</h1>
-      <p className="text-muted-foreground text-lg">Density mapping and historical congestion analysis.</p>
+    <div className="space-y-6 w-full max-w-full">
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Orbital Analytics</h1>
+        <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">Density mapping and historical congestion analysis across altitude shells</p>
+      </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Congestion by Altitude Band</CardTitle>
-            <CardDescription>Object count grouped by 100km altitude bands</CardDescription>
+      <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+        {/* Congestion Bar Chart */}
+        <Card className="min-w-0 overflow-hidden">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base sm:text-lg">Congestion by Altitude Band</CardTitle>
+            <CardDescription className="text-xs">Object count grouped by 100km altitude bands</CardDescription>
           </CardHeader>
-          <CardContent className="h-[400px]">
+          <CardContent className="h-[320px] sm:h-[400px] p-2 min-w-0">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={congestion.altitudeBands}
                 layout="vertical"
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                margin={{ top: 5, right: 15, left: 0, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" />
-                <XAxis type="number" tick={{fill: 'hsl(var(--muted-foreground))'}} tickLine={false} axisLine={false} />
-                <YAxis dataKey="label" type="category" width={80} tick={{fill: 'hsl(var(--muted-foreground))'}} tickLine={false} axisLine={false} />
+                <XAxis type="number" tick={{fill: 'hsl(var(--muted-foreground))', fontSize: 11}} tickLine={false} axisLine={false} />
+                <YAxis dataKey="label" type="category" width={70} tick={{fill: 'hsl(var(--muted-foreground))', fontSize: 10}} tickLine={false} axisLine={false} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', color: 'hsl(var(--foreground))' }}
+                  contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', color: 'hsl(var(--foreground))', borderRadius: '8px', fontSize: '12px' }}
                   itemStyle={{ color: 'hsl(var(--primary))' }}
                   cursor={{fill: 'hsl(var(--muted)/0.5)'}}
                 />
@@ -68,20 +77,21 @@ export default function Analytics() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Orbit Type Distribution</CardTitle>
-            <CardDescription>Proportional breakdown of tracked objects</CardDescription>
+        {/* Orbit Type Distribution Pie Chart */}
+        <Card className="min-w-0 overflow-hidden">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base sm:text-lg">Orbit Type Distribution</CardTitle>
+            <CardDescription className="text-xs">Proportional breakdown of tracked objects</CardDescription>
           </CardHeader>
-          <CardContent className="h-[400px]">
+          <CardContent className="h-[320px] sm:h-[400px] p-2 min-w-0">
             <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
+              <PieChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
                 <Pie
                   data={distribution}
                   cx="50%"
                   cy="50%"
-                  innerRadius={80}
-                  outerRadius={120}
+                  innerRadius={65}
+                  outerRadius={105}
                   paddingAngle={2}
                   dataKey="count"
                   nameKey="orbitType"
@@ -94,52 +104,16 @@ export default function Analytics() {
                   ))}
                 </Pie>
                 <Tooltip 
-                  contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))' }}
+                  contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px', fontSize: '12px' }}
                   itemStyle={{ color: 'hsl(var(--foreground))' }}
-                  formatter={(value: number, name: string, props: any) => [`${value} (${props.payload.percentage.toFixed(1)}%)`, name]}
+                  formatter={(value: any, name: string, props: any) => [`${value} (${props.payload.percentage.toFixed(1)}%)`, name]}
                 />
-                <Legend />
+                <Legend 
+                  verticalAlign="bottom" 
+                  height={36} 
+                  wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} 
+                />
               </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Congestion History</CardTitle>
-            <CardDescription>Historical trend of total tracked objects</CardDescription>
-          </CardHeader>
-          <CardContent className="h-[400px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={congestion.history}
-                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-              >
-                <defs>
-                  <linearGradient id="colorSat" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                  </linearGradient>
-                  <linearGradient id="colorDeb" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--destructive))" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="hsl(var(--destructive))" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                <XAxis 
-                  dataKey="date" 
-                  tickFormatter={(val) => new Date(val).toLocaleDateString(undefined, {month:'short', year:'2-digit'})}
-                  tick={{fill: 'hsl(var(--muted-foreground))'}} tickLine={false} axisLine={false} 
-                />
-                <YAxis tick={{fill: 'hsl(var(--muted-foreground))'}} tickLine={false} axisLine={false} />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))' }}
-                  labelFormatter={(val) => new Date(val).toLocaleDateString()}
-                />
-                <Legend />
-                <Area type="monotone" dataKey="satellites" name="Satellites" stroke="hsl(var(--primary))" fillOpacity={1} fill="url(#colorSat)" stackId="1" />
-                <Area type="monotone" dataKey="debris" name="Debris/Rocket Bodies" stroke="hsl(var(--destructive))" fillOpacity={1} fill="url(#colorDeb)" stackId="1" />
-              </AreaChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>

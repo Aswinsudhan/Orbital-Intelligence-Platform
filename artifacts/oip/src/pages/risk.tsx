@@ -5,7 +5,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, Info, AlertTriangle, AlertOctagon } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { ShieldCheck, Info, AlertTriangle, AlertOctagon, ChevronRight } from "lucide-react";
 
 export default function RiskEngine() {
   const [category, setCategory] = useState<string>("all");
@@ -25,35 +26,35 @@ export default function RiskEngine() {
 
   const getRiskColor = (cat?: string) => {
     switch (cat?.toLowerCase()) {
-      case 'low': return 'text-green-500 bg-green-500/10 border-green-500/20';
-      case 'medium': return 'text-amber-500 bg-amber-500/10 border-amber-500/20';
-      case 'high': return 'text-orange-500 bg-orange-500/10 border-orange-500/20';
-      case 'critical': return 'text-red-500 bg-red-500/10 border-red-500/20';
+      case 'low': return 'text-emerald-400 bg-emerald-950/30 border-emerald-500/30';
+      case 'medium': return 'text-amber-400 bg-amber-950/30 border-amber-500/30';
+      case 'high': return 'text-orange-400 bg-orange-950/30 border-orange-500/30';
+      case 'critical': return 'text-red-400 bg-red-950/30 border-red-500/30';
       default: return 'text-muted-foreground bg-muted border-border';
     }
   };
 
   const getRiskIcon = (cat?: string) => {
     switch (cat?.toLowerCase()) {
-      case 'low': return <ShieldCheck className="w-4 h-4 mr-1 inline-block" />;
-      case 'medium': return <Info className="w-4 h-4 mr-1 inline-block" />;
-      case 'high': return <AlertTriangle className="w-4 h-4 mr-1 inline-block" />;
-      case 'critical': return <AlertOctagon className="w-4 h-4 mr-1 inline-block" />;
+      case 'low': return <ShieldCheck className="w-3.5 h-3.5 mr-1 inline-block" />;
+      case 'medium': return <Info className="w-3.5 h-3.5 mr-1 inline-block" />;
+      case 'high': return <AlertTriangle className="w-3.5 h-3.5 mr-1 inline-block" />;
+      case 'critical': return <AlertOctagon className="w-3.5 h-3.5 mr-1 inline-block" />;
       default: return null;
     }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="space-y-6 w-full max-w-full">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Risk Engine</h1>
-          <p className="text-muted-foreground mt-1">Multi-factor orbital risk assessment leaderboard</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Risk Engine</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">Multi-factor orbital collision and debris hazard assessment</p>
         </div>
         
         <div className="w-full sm:w-[200px]">
           <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger>
+            <SelectTrigger className="h-11">
               <SelectValue placeholder="Risk Category" />
             </SelectTrigger>
             <SelectContent>
@@ -67,75 +68,133 @@ export default function RiskEngine() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-border overflow-hidden bg-card">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[120px]">Score (0-100)</TableHead>
-              <TableHead>NORAD ID</TableHead>
-              <TableHead>Object Name</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead className="text-right">Last Calculated</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              Array(10).fill(0).map((_, i) => (
-                <TableRow key={i}>
-                  <TableCell><Skeleton className="h-6 w-12 rounded-full" /></TableCell>
-                  <TableCell><Skeleton className="h-5 w-16" /></TableCell>
-                  <TableCell><Skeleton className="h-5 w-32" /></TableCell>
-                  <TableCell><Skeleton className="h-6 w-24 rounded-full" /></TableCell>
-                  <TableCell className="text-right"><Skeleton className="h-5 w-24 ml-auto" /></TableCell>
-                </TableRow>
-              ))
-            ) : !data || data.length === 0 ? (
+      {/* ======================================================== */}
+      {/* MOBILE CARD VIEW: Visible only on small screens (md:hidden)*/}
+      {/* ======================================================== */}
+      <div className="md:hidden space-y-3">
+        {isLoading ? (
+          Array(5).fill(0).map((_, i) => (
+            <Card key={i} className="p-4">
+              <div className="flex justify-between items-center mb-2">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-6 w-14 rounded-full" />
+              </div>
+              <Skeleton className="h-4 w-20 mb-2" />
+              <Skeleton className="h-2 w-full rounded-full" />
+            </Card>
+          ))
+        ) : !data || data.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground bg-card rounded-xl border border-border">
+            No risk scores found.
+          </div>
+        ) : (
+          data.map((score) => {
+            const numScore = Math.round(Number(score.overallScore));
+            return (
+              <Card key={score.noradId} className="p-4 border border-border hover:border-cyan-500/40 transition-colors">
+                <div className="flex justify-between items-start gap-2 mb-2">
+                  <div className="min-w-0">
+                    <h3 className="font-semibold text-base text-foreground truncate">
+                      {score.satellite?.name || `Object #${score.noradId}`}
+                    </h3>
+                    <p className="text-xs font-mono text-cyan-400">NORAD #{score.noradId}</p>
+                  </div>
+                  <Badge variant="outline" className={`font-mono text-[10px] uppercase shrink-0 ${getRiskColor(score.riskCategory)}`}>
+                    {getRiskIcon(score.riskCategory)}
+                    {score.riskCategory}
+                  </Badge>
+                </div>
+
+                {/* Score Progress Bar */}
+                <div className="mt-3 pt-2 border-t border-border/50">
+                  <div className="flex justify-between text-xs font-mono mb-1">
+                    <span className="text-muted-foreground">Threat Score</span>
+                    <span className="font-bold text-foreground">{numScore} / 100</span>
+                  </div>
+                  <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                    <div 
+                      className={`h-full rounded-full ${
+                        numScore >= 75 ? 'bg-red-500' :
+                        numScore >= 50 ? 'bg-orange-500' :
+                        numScore >= 25 ? 'bg-amber-500' : 'bg-emerald-500'
+                      }`}
+                      style={{ width: `${Math.min(numScore, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              </Card>
+            );
+          })
+        )}
+      </div>
+
+      {/* ======================================================== */}
+      {/* DESKTOP TABLE VIEW: Visible on tablets and up (hidden md:block)*/}
+      {/* ======================================================== */}
+      <div className="hidden md:block rounded-xl border border-border overflow-hidden bg-card">
+        <div className="w-full overflow-x-auto touch-pan-x">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                  No risk scores found.
-                </TableCell>
+                <TableHead className="w-[120px]">Score (0-100)</TableHead>
+                <TableHead>NORAD ID</TableHead>
+                <TableHead>Object Name</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead className="text-right">Last Calculated</TableHead>
               </TableRow>
-            ) : (
-              data.map((score) => (
-                <TableRow key={score.noradId} className="hover:bg-muted/50 transition-colors">
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center font-mono text-sm font-bold border" style={{
-                        borderColor: `currentColor`,
-                        color: score.category === 'critical' ? 'var(--color-destructive)' : 
-                               score.category === 'high' ? 'var(--color-chart-4)' : 
-                               score.category === 'medium' ? 'var(--color-chart-3)' : 'var(--color-chart-2)'
-                      }}>
-                        {score.score}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-mono font-medium">
-                    {(score as any).objectType === "satellite" ? (
-                      <Link href={`/satellites/${score.noradId}`} className="text-primary hover:underline">
-                        {score.noradId}
-                      </Link>
-                    ) : (
-                      <span className="text-muted-foreground" title="Debris / Rocket Body — no detail page">
-                        {score.noradId}
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell className="font-medium text-foreground">{score.name}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={`uppercase tracking-wider text-[10px] ${getRiskColor(score.category)}`}>
-                      {getRiskIcon(score.category)}
-                      {score.category}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right font-mono text-sm text-muted-foreground">
-                    {new Date(score.lastCalculated).toLocaleString()}
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                Array(10).fill(0).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell><Skeleton className="h-6 w-12 rounded-full" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-16" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-32" /></TableCell>
+                    <TableCell><Skeleton className="h-6 w-24 rounded-full" /></TableCell>
+                    <TableCell className="text-right"><Skeleton className="h-5 w-24 ml-auto" /></TableCell>
+                  </TableRow>
+                ))
+              ) : !data || data.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                    No risk scores found.
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                data.map((score) => (
+                  <TableRow key={score.noradId} className="hover:bg-muted/50 transition-colors">
+                    <TableCell>
+                      <span className="font-mono font-bold text-base">
+                        {Math.round(Number(score.overallScore))}
+                      </span>
+                    </TableCell>
+                    <TableCell className="font-mono text-primary font-medium">
+                      {score.satellite?.id ? (
+                        <Link href={`/satellites/${score.satellite.id}`} className="hover:underline">
+                          {score.noradId}
+                        </Link>
+                      ) : (
+                        score.noradId
+                      )}
+                    </TableCell>
+                    <TableCell className="font-medium text-foreground">
+                      {score.satellite?.name || `Object #${score.noradId}`}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className={`font-mono text-xs uppercase ${getRiskColor(score.riskCategory)}`}>
+                        {getRiskIcon(score.riskCategory)}
+                        {score.riskCategory}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right font-mono text-xs text-muted-foreground">
+                      {score.calculatedAt ? new Date(score.calculatedAt).toLocaleString() : 'N/A'}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );
